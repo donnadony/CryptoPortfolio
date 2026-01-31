@@ -16,41 +16,39 @@ struct PortfolioScreen: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                if viewModel.isLoading && viewModel.assets.isEmpty {
-                    loadingView
-                } else if let error = viewModel.error, viewModel.assets.isEmpty {
-                    errorView(error)
-                } else if viewModel.hasAssets {
-                    assetsListView
-                } else {
-                    emptyStateView
-                }
+        ZStack {
+            if viewModel.isLoading && viewModel.assets.isEmpty {
+                loadingView
+            } else if let error = viewModel.error, viewModel.assets.isEmpty {
+                errorView(error)
+            } else if viewModel.hasAssets {
+                assetsListView
+            } else {
+                emptyStateView
             }
-            .navigationTitle("Portfolio")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    addAssetButton
-                }
+        }
+        .navigationTitle("Portfolio")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                addAssetButton
             }
-            .sheet(isPresented: $showAddSheet) {
-                AddAssetSheet(
-                    isPresented: $showAddSheet,
-                    onAdd: { symbol, amount in
-                        Task {
-                            await viewModel.addAsset(symbol: symbol, amount: amount)
-                        }
+        }
+        .sheet(isPresented: $showAddSheet) {
+            AddAssetSheet(
+                isPresented: $showAddSheet,
+                onAdd: { symbol, amount in
+                    Task {
+                        await viewModel.addAsset(symbol: symbol, amount: amount)
                     }
-                )
-            }
-            .task {
-                await viewModel.loadAssets()
-            }
-            .refreshable {
-                await viewModel.refreshAssets()
-            }
+                }
+            )
+        }
+        .task {
+            await viewModel.loadAssets()
+        }
+        .refreshable {
+            await viewModel.refreshAssets()
         }
     }
     
@@ -140,7 +138,7 @@ struct PortfolioScreen: View {
             if !viewModel.assets.isEmpty {
                 Section("Holdings") {
                     ForEach(viewModel.assets) { asset in
-                        NavigationLink(destination: AssetDetailScreen(asset: asset, viewModel: viewModel)) {
+                        NavigationLink(value: Route.assetDetail(asset)) {
                             AssetRowView(asset: asset)
                         }
                     }

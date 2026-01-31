@@ -499,8 +499,7 @@ private struct EditAssetSheet: View {
                 name: "Bitcoin",
                 amount: 0.5,
                 currentPrice: 45000
-            ),
-            viewModel: PortfolioViewModel()
+            )
         )
     }
 }
