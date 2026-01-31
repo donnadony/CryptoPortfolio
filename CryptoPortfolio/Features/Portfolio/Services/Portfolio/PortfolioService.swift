@@ -18,7 +18,7 @@ class PortfolioService: PortfolioServiceProtocol {
     
     // MARK: - Initialization
     
-    init(
+    nonisolated init(
         apiService: APIServiceProtocol = APIService.shared,
         userDefaults: UserDefaults = .standard
     ) {
