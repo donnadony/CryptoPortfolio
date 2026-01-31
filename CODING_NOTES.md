@@ -200,6 +200,52 @@ class FeatureService: FeatureServiceProtocol {
 
 ---
 
+## ⚠️ **Swift Concurrency Issues**
+
+### **❌ MainActor Isolation Error**
+
+**Error:**
+```
+Call to main actor-isolated initializer 'init(...)' in a synchronous nonisolated context
+```
+
+**Problema:**
+```swift
+@MainActor
+class MyViewModel: ObservableObject {
+    init(service: MyServiceProtocol = MyService()) {  // ❌ Error aquí
+        self.service = service
+    }
+}
+
+class MyService {
+    init() { }  // ❌ Llamado desde @MainActor context
+}
+```
+
+**Solución: Usar `nonisolated init` en Services**
+```swift
+class MyService: MyServiceProtocol {
+    nonisolated init(  // ✅ Puede ser llamado desde cualquier contexto
+        apiService: APIServiceProtocol = APIService.shared,
+        userDefaults: UserDefaults = .standard
+    ) {
+        self.apiService = apiService
+        self.userDefaults = userDefaults
+    }
+}
+```
+
+**¿Por qué?**
+- ViewModels son `@MainActor` (manejan UI)
+- Services NO son `@MainActor` (solo hacen network/storage)
+- Init de service debe ser `nonisolated` para permitir instanciación desde cualquier contexto
+- Los métodos `async` del service funcionan bien (async puede cruzar actors)
+
+**Regla:** Siempre usa `nonisolated init` en Services
+
+---
+
 ## 🚫 **Don't Do This**
 
 ### **❌ Missing Combine Import**
