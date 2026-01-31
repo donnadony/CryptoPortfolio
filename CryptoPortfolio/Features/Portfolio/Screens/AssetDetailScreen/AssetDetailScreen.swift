@@ -10,18 +10,13 @@ import SwiftUI
 struct AssetDetailScreen: View {
     // MARK: - Properties
     
-    let asset: Asset
-    let viewModel: PortfolioViewModel
-    
     @StateObject private var detailViewModel: AssetDetailViewModel
     @Environment(\.dismiss) var dismiss
     
     @State private var showDeleteConfirmation = false
     @State private var showEditSheet = false
     
-    init(asset: Asset, viewModel: PortfolioViewModel) {
-        self.asset = asset
-        self.viewModel = viewModel
+    init(asset: Asset) {
         _detailViewModel = StateObject(wrappedValue: AssetDetailViewModel(asset: asset))
     }
     

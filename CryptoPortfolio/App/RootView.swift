@@ -26,7 +26,7 @@ struct RootView: View {
         case .portfolio:
             PortfolioScreen()
         case .assetDetail(let asset):
-            AssetDetailScreen(asset: asset)
+            AssetDetailScreen(asset: asset, viewModel: <#PortfolioViewModel#>)
         case .addAsset:
             AddAssetScreen()
         case .market:
