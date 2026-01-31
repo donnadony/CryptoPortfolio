@@ -29,9 +29,10 @@ Pods/
 # Carthage
 Carthage/Build/
 
-# Documentation files (except README.md)
+# Documentation files (only README and SETUP)
 *.md
 !README.md
+!SETUP.md
 
 # Local documentation folder
 docs/
