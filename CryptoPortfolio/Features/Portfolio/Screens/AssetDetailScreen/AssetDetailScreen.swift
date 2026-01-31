@@ -30,7 +30,7 @@ struct AssetDetailScreen: View {
                 scrollableContent
             }
         }
-        .navigationTitle(asset.symbol)
+        .navigationTitle(detailViewModel.asset.symbol)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -51,7 +51,7 @@ struct AssetDetailScreen: View {
         }
         .sheet(isPresented: $showEditSheet) {
             EditAssetSheet(
-                asset: asset,
+                asset: detailViewModel.asset,
                 isPresented: $showEditSheet,
                 onSave: { newAmount in
                     Task {
@@ -63,7 +63,7 @@ struct AssetDetailScreen: View {
         .confirmationDialog(
             "Delete Asset",
             isPresented: $showDeleteConfirmation,
-            presenting: asset
+            presenting: detailViewModel.asset
         ) { asset in
             Button("Delete", role: .destructive) {
                 Task {
@@ -135,11 +135,11 @@ struct AssetDetailScreen: View {
         VStack(spacing: 16) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(asset.symbol)
+                    Text(detailViewModel.asset.symbol)
                         .font(.title2)
                         .fontWeight(.bold)
                     
-                    Text(asset.name)
+                    Text(detailViewModel.asset.name)
                         .font(.callout)
                         .foregroundColor(.secondary)
                 }
@@ -147,7 +147,7 @@ struct AssetDetailScreen: View {
                 Spacer()
                 
                 VStack(alignment: .center, spacing: 0) {
-                    Text(String(asset.symbol.prefix(1)))
+                    Text(String(detailViewModel.asset.symbol.prefix(1)))
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.white)
                 }
@@ -166,7 +166,7 @@ struct AssetDetailScreen: View {
                     
                     Spacer()
                     
-                    Text(asset.formattedPrice)
+                    Text(detailViewModel.asset.formattedPrice)
                         .font(.headline)
                         .foregroundColor(.primary)
                 }
@@ -178,7 +178,7 @@ struct AssetDetailScreen: View {
                     
                     Spacer()
                     
-                    Text(asset.formattedAmount)
+                    Text(detailViewModel.asset.formattedAmount)
                         .font(.headline)
                         .foregroundColor(.primary)
                 }
@@ -190,7 +190,7 @@ struct AssetDetailScreen: View {
                     
                     Spacer()
                     
-                    Text(asset.formattedValue)
+                    Text(detailViewModel.asset.formattedValue)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(Color(hex: "#F7931A"))
                 }
@@ -245,7 +245,7 @@ struct AssetDetailScreen: View {
                     
                     Spacer()
                     
-                    Text(asset.formattedAmount)
+                    Text(detailViewModel.asset.formattedAmount)
                         .fontWeight(.semibold)
                 }
                 
@@ -255,7 +255,7 @@ struct AssetDetailScreen: View {
                     
                     Spacer()
                     
-                    Text(asset.formattedPrice)
+                    Text(detailViewModel.asset.formattedPrice)
                         .fontWeight(.semibold)
                 }
                 
@@ -267,7 +267,7 @@ struct AssetDetailScreen: View {
                     
                     Spacer()
                     
-                    Text(asset.formattedValue)
+                    Text(detailViewModel.asset.formattedValue)
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(Color(hex: "#F7931A"))
                 }
