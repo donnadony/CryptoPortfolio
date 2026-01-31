@@ -7,10 +7,12 @@
 
 import Foundation
 
-enum Route: Hashable,Equatable {
+enum Route: Hashable, Equatable {
+    
     case portfolio
     case assetDetail(Asset)
     case addAsset
     case market
     case settings
+    
 }
