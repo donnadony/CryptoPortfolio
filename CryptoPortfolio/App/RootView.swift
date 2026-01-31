@@ -11,11 +11,30 @@ struct RootView: View {
     @StateObject private var router = Router()
     
     var body: some View {
-        NavigationStack(path: $router.path) {
-            PortfolioScreen()
-                .navigationDestination(for: Route.self) { route in
-                    routeView(for: route)
-                }
+        TabView {
+            NavigationStack(path: $router.path) {
+                PortfolioScreen()
+                    .navigationDestination(for: Route.self) { route in
+                        routeView(for: route)
+                    }
+            }
+            .tabItem {
+                Label("Portfolio", systemImage: "chart.pie.fill")
+            }
+            
+            NavigationStack {
+                MarketScreen()
+            }
+            .tabItem {
+                Label("Market", systemImage: "chart.bar.fill")
+            }
+            
+            NavigationStack {
+                SettingsScreen()
+            }
+            .tabItem {
+                Label("Settings", systemImage: "gearshape.fill")
+            }
         }
         .environmentObject(router)
     }
@@ -30,9 +49,9 @@ struct RootView: View {
         case .addAsset:
             AddAssetScreen()
         case .market:
-            Text("Market Screen - Coming Soon")
+            MarketScreen()
         case .settings:
-            Text("Settings Screen - Coming Soon")
+            SettingsScreen()
         }
     }
 }
