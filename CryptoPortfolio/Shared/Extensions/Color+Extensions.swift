@@ -188,29 +188,24 @@ extension Color {
     }
 }
 
-// MARK: - Environment-based Color Init (SwiftUI Native)
+// MARK: - Environment-based Color Init (Pure SwiftUI - iOS 16+)
 
 extension Color {
+    /// Create an adaptive color that responds to color scheme changes
+    /// Uses UIColor dynamic provider on iOS for proper system integration
     init(light: Color, dark: Color) {
-        // Use @Environment(\.colorScheme) in views instead
-        // This is kept for compatibility but uses light color by default
-        self = light
-    }
-}
-
-#if os(iOS)
-import UIKit
-
-extension UIColor {
-    convenience init(light: UIColor, dark: UIColor) {
-        self.init { traitCollection in
+        #if os(iOS)
+        self.init(uiColor: UIColor { traitCollection in
             switch traitCollection.userInterfaceStyle {
             case .dark:
-                return dark
+                return UIColor(dark)
             default:
-                return light
+                return UIColor(light)
             }
-        }
+        })
+        #else
+        // macOS fallback - use light color
+        self = light
+        #endif
     }
 }
-#endif

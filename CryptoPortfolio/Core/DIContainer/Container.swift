@@ -182,6 +182,15 @@ extension Container {
         )
     }
     
+    /// Creates an AnalyticsDashboardViewModel with injected dependencies
+    @MainActor
+    func makeAnalyticsDashboardViewModel() -> AnalyticsDashboardViewModel {
+        AnalyticsDashboardViewModel(
+            getAssetsUseCase: getAssetsUseCase,
+            calculatePortfolioTotalUseCase: calculatePortfolioTotalUseCase
+        )
+    }
+    
     // MARK: - Generic Resolve
     
     /// Resolve any type from the container

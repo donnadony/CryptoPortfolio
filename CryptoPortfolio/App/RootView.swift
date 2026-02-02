@@ -9,9 +9,11 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject private var router = Router()
+    @StateObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         TabView {
+            // Portfolio Tab
             NavigationStack(path: $router.path) {
                 PortfolioScreen()
                     .navigationDestination(for: Route.self) { route in
@@ -23,15 +25,21 @@ struct RootView: View {
             }
             
             #if os(iOS)
+            // Market Tab
             NavigationStack {
                 MarketScreen()
             }
             .tabItem {
                 Label("Market", systemImage: "chart.bar.fill")
             }
-            #endif
             
-            #if os(iOS)
+            // Analytics Tab
+            AnalyticsDashboardScreen()
+                .tabItem {
+                    Label("Analytics", systemImage: "chart.xyaxis.line")
+                }
+            
+            // Watchlist Tab
             NavigationStack {
                 WatchlistScreen()
             }
@@ -39,8 +47,7 @@ struct RootView: View {
                 Label("Watchlist", systemImage: "star.fill")
             }
             
-            #endif
-            #if os(iOS)
+            // Settings Tab
             NavigationStack {
                 SettingsScreen()
             }
@@ -50,6 +57,8 @@ struct RootView: View {
             #endif
         }
         .environmentObject(router)
+        .environmentObject(themeManager)
+        .preferredColorScheme(themeManager.preferredColorScheme)
     }
     
     @ViewBuilder
@@ -58,35 +67,30 @@ struct RootView: View {
         #if os(iOS)
         case .portfolio:
             PortfolioScreen()
-        #else
-        case .portfolio:
-            Text("Portfolio not available on this platform")
-        #endif
-        #if os(iOS)
         case .assetDetail(let asset):
             AssetDetailScreen(asset: asset)
-        #else
-        case .assetDetail:
-            Text("Asset detail not available on this platform")
-        #endif
-        #if os(iOS)
         case .addAsset:
             AddAssetScreen()
-        #else
-        case .addAsset:
-            Text("Add Asset not available on this platform")
-        #endif
-        #if os(iOS)
         case .market:
             MarketScreen()
-        #else
-        case .market:
-            Text("Market not available on this platform")
-        #endif
-        #if os(iOS)
+        case .analytics:
+            AnalyticsDashboardScreen()
+        case .analyticsExport:
+            Text("Export Analytics")
+                .navigationTitle("Export")
         case .settings:
             SettingsScreen()
         #else
+        case .portfolio:
+            Text("Portfolio not available on this platform")
+        case .assetDetail:
+            Text("Asset detail not available on this platform")
+        case .addAsset:
+            Text("Add Asset not available on this platform")
+        case .market:
+            Text("Market not available on this platform")
+        case .analytics, .analyticsExport:
+            Text("Analytics not available on this platform")
         case .settings:
             Text("Settings not available on this platform")
         #endif
@@ -99,4 +103,5 @@ struct RootView: View {
 #Preview {
     RootView()
         .withContainer()
+        .environmentObject(ThemeManager.shared)
 }
