@@ -15,6 +15,9 @@ struct PortfolioScreen: View {
     @State private var assetToDelete: Asset?
     @State private var showDeleteConfirmation = false
     
+    /// Tracks if we need to refresh after sheet dismissal
+    @State private var needsRefreshOnAppear = false
+    
     init() {
         // Use DI container to create ViewModel
         _viewModel = StateObject(wrappedValue: Container.shared.makePortfolioViewModel())
@@ -26,10 +29,17 @@ struct PortfolioScreen: View {
                 AdaptiveMeshBackground()
                 
                 Group {
-                    if viewModel.assets.isEmpty && !viewModel.isLoading {
-                        emptyStateView
-                    } else {
-                        portfolioView
+                    switch viewModel.state {
+                    case .loading where viewModel.assets.isEmpty:
+                        loadingView
+                    case .error(let error) where viewModel.assets.isEmpty:
+                        errorView(error)
+                    default:
+                        if viewModel.assets.isEmpty {
+                            emptyStateView
+                        } else {
+                            portfolioView
+                        }
                     }
                 }
             }
@@ -44,7 +54,12 @@ struct PortfolioScreen: View {
                     }
                 }
             }
-            .sheet(isPresented: $showAddAsset) {
+            .sheet(isPresented: $showAddAsset, onDismiss: {
+                // Refresh portfolio when sheet is dismissed
+                Task {
+                    await viewModel.refreshAssets()
+                }
+            }) {
                 AddAssetScreen()
             }
             .task {
@@ -52,6 +67,12 @@ struct PortfolioScreen: View {
             }
             .refreshable {
                 await viewModel.refreshAssets()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .portfolioDidChange)) { _ in
+                // Listen for portfolio change notifications from anywhere in the app
+                Task {
+                    await viewModel.refreshAssets()
+                }
             }
             .alert("Error", isPresented: .constant(viewModel.error != nil)) {
                 Button("OK") {
@@ -77,6 +98,46 @@ struct PortfolioScreen: View {
                 Text("Are you sure you want to delete \(asset.name) from your portfolio?")
             }
         }
+    }
+    
+    // MARK: - Loading View
+    
+    private var loadingView: some View {
+        VStack(spacing: AppTheme.Spacing.lg) {
+            ProgressView()
+                .scaleEffect(1.5)
+            Text("Loading Portfolio...")
+                .font(AppTheme.Typography.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    // MARK: - Error View
+    
+    private func errorView(_ error: DomainError) -> some View {
+        VStack(spacing: AppTheme.Spacing.lg) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(AppTheme.Colors.warning)
+            
+            Text("Unable to Load Portfolio")
+                .font(AppTheme.Typography.title3)
+            
+            Text(error.localizedDescription)
+                .font(AppTheme.Typography.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
+            Button("Try Again") {
+                Task {
+                    await viewModel.loadAssets()
+                }
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     // MARK: - Views

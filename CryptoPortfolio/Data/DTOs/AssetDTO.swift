@@ -37,6 +37,31 @@ struct AssetStorageDTO: Codable {
     let currentPrice: Double
     let savedAt: Date
     
+    // MARK: - CodingKeys (support both snake_case and camelCase)
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case symbol
+        case name
+        case amount
+        case currentPrice = "current_price"
+        case currentPriceCamel = "currentPrice"
+        case savedAt = "saved_at"
+        case savedAtCamel = "savedAt"
+        case totalValue = "total_value"  // Old format field (ignored but accepted)
+    }
+    
+    // MARK: - Initialization
+    
+    init(id: String, symbol: String, name: String, amount: Double, currentPrice: Double, savedAt: Date = Date()) {
+        self.id = id
+        self.symbol = symbol
+        self.name = name
+        self.amount = amount
+        self.currentPrice = currentPrice
+        self.savedAt = savedAt
+    }
+    
     init(from asset: Asset) {
         self.id = asset.id
         self.symbol = asset.symbol
@@ -46,6 +71,50 @@ struct AssetStorageDTO: Codable {
         self.savedAt = Date()
     }
     
+    // MARK: - Custom Decodable (handles old and new formats)
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // Required fields with fallbacks
+        id = try container.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
+        symbol = try container.decodeIfPresent(String.self, forKey: .symbol) ?? ""
+        name = try container.decodeIfPresent(String.self, forKey: .name) ?? ""
+        amount = try container.decodeIfPresent(Double.self, forKey: .amount) ?? 0.0
+        
+        // Try snake_case first, then camelCase
+        if let price = try? container.decodeIfPresent(Double.self, forKey: .currentPrice) {
+            currentPrice = price ?? 0.0
+        } else if let price = try? container.decodeIfPresent(Double.self, forKey: .currentPriceCamel) {
+            currentPrice = price ?? 0.0
+        } else {
+            currentPrice = 0.0
+        }
+        
+        // Date handling: try snake_case, then camelCase, then default
+        if let date = try? container.decodeIfPresent(Date.self, forKey: .savedAt) {
+            savedAt = date ?? Date()
+        } else if let date = try? container.decodeIfPresent(Date.self, forKey: .savedAtCamel) {
+            savedAt = date ?? Date()
+        } else {
+            savedAt = Date()
+        }
+    }
+    
+    // MARK: - Encodable (always use snake_case for new data)
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(symbol, forKey: .symbol)
+        try container.encode(name, forKey: .name)
+        try container.encode(amount, forKey: .amount)
+        try container.encode(currentPrice, forKey: .currentPrice)
+        try container.encode(savedAt, forKey: .savedAt)
+    }
+    
+    // MARK: - Domain Conversion
+    
     func toDomain() -> Asset {
         Asset(
             id: id,
@@ -53,6 +122,36 @@ struct AssetStorageDTO: Codable {
             name: name,
             amount: amount,
             currentPrice: currentPrice
+        )
+    }
+}
+
+// MARK: - Legacy Asset Format (for migration)
+
+/// Legacy format that may exist in older app versions
+struct LegacyAssetStorageDTO: Codable {
+    let id: String?
+    let symbol: String?
+    let name: String?
+    let amount: Double?
+    let currentPrice: Double?
+    let current_price: Double?
+    let totalValue: Double?
+    let total_value: Double?
+    let iconURL: String?
+    let icon_url: String?
+    let savedAt: Date?
+    let saved_at: Date?
+    
+    /// Convert to current DTO format
+    func toCurrentDTO() -> AssetStorageDTO {
+        AssetStorageDTO(
+            id: id ?? UUID().uuidString,
+            symbol: symbol ?? "",
+            name: name ?? "",
+            amount: amount ?? 0.0,
+            currentPrice: currentPrice ?? current_price ?? 0.0,
+            savedAt: savedAt ?? saved_at ?? Date()
         )
     }
 }

@@ -69,6 +69,13 @@ final class AddAssetViewModel: ObservableObject {
             
             try await addAssetUseCase.execute(asset)
             error = nil
+            
+            // Notify that portfolio changed
+            await NotificationCenter.postPortfolioChange(userInfo: [
+                "action": "add",
+                "symbol": asset.symbol
+            ])
+            
             return true
         } catch let domainError as DomainError {
             self.error = domainError

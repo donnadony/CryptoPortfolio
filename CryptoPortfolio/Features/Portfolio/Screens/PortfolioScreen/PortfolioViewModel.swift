@@ -161,6 +161,12 @@ final class PortfolioViewModel: ObservableObject {
             )
             state = assets.isEmpty ? .idle : .loaded(portfolioData)
             
+            // Notify other views that portfolio changed
+            await NotificationCenter.postPortfolioChange(userInfo: [
+                "action": "delete",
+                "assetId": asset.id
+            ])
+            
         } catch let domainError as DomainError {
             self.error = domainError
         } catch {
