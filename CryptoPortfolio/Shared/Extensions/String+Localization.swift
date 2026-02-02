@@ -39,20 +39,23 @@ extension String {
 
 /// Centralized localization keys for type-safe access
 enum LocalizedKey {
-    
+
     // MARK: - Tab Bar
-    
+
     enum Tab {
+
         static let portfolio = "Tab.Portfolio"
         static let market = "Tab.Market"
         static let analytics = "Tab.Analytics"
         static let watchlist = "Tab.Watchlist"
         static let settings = "Tab.Settings"
+
     }
-    
+
     // MARK: - Portfolio Screen
-    
+
     enum Portfolio {
+
         static let title = "Portfolio.Title"
         static let emptyTitle = "Portfolio.Empty.Title"
         static let emptyMessage = "Portfolio.Empty.Message"
@@ -63,20 +66,24 @@ enum LocalizedKey {
         static let tryAgain = "Portfolio.TryAgain"
         static let deleteTitle = "Portfolio.Delete.Title"
         static let deleteMessage = "Portfolio.Delete.Message"
+
     }
-    
+
     // MARK: - Market Screen
-    
+
     enum Market {
+
         static let title = "Market.Title"
         static let searchPrompt = "Market.SearchPrompt"
         static let loading = "Market.Loading"
         static let emptyTitle = "Market.Empty.Title"
+
     }
-    
+
     // MARK: - Analytics Screen
-    
+
     enum Analytics {
+
         static let title = "Analytics.Title"
         static let performance = "Analytics.Performance"
         static let totalReturn = "Analytics.TotalReturn"
@@ -89,8 +96,6 @@ enum LocalizedKey {
         static let export = "Analytics.Export"
         static let compare = "Analytics.Compare"
         static let alerts = "Analytics.Alerts"
-        
-        // Timeframes
         static let day = "Analytics.Timeframe.Day"
         static let week = "Analytics.Timeframe.Week"
         static let month = "Analytics.Timeframe.Month"
@@ -101,20 +106,24 @@ enum LocalizedKey {
         static let last30Days = "Analytics.Timeframe.Last30Days"
         static let lastYear = "Analytics.Timeframe.LastYear"
         static let allTime = "Analytics.Timeframe.AllTime"
+
     }
-    
+
     // MARK: - Watchlist Screen
-    
+
     enum Watchlist {
+
         static let title = "Watchlist.Title"
         static let emptyTitle = "Watchlist.Empty.Title"
         static let emptyMessage = "Watchlist.Empty.Message"
         static let browseMarket = "Watchlist.BrowseMarket"
+
     }
-    
+
     // MARK: - Settings Screen
-    
+
     enum Settings {
+
         static let title = "Settings.Title"
         static let appearance = "Settings.Appearance"
         static let theme = "Settings.Theme"
@@ -125,21 +134,19 @@ enum LocalizedKey {
         static let about = "Settings.About"
         static let version = "Settings.Version"
         static let resetDefaults = "Settings.ResetDefaults"
-        
-        // Theme options
         static let themeLight = "Settings.Theme.Light"
         static let themeDark = "Settings.Theme.Dark"
         static let themeSystem = "Settings.Theme.System"
-        
-        // Language options
         static let languageEnglish = "Settings.Language.English"
         static let languageSpanish = "Settings.Language.Spanish"
         static let languageSystem = "Settings.Language.System"
+
     }
-    
+
     // MARK: - Add Asset Screen
-    
+
     enum AddAsset {
+
         static let title = "AddAsset.Title"
         static let cryptocurrency = "AddAsset.Cryptocurrency"
         static let symbolPlaceholder = "AddAsset.SymbolPlaceholder"
@@ -148,11 +155,13 @@ enum LocalizedKey {
         static let currentPrice = "AddAsset.CurrentPrice"
         static let totalValue = "AddAsset.TotalValue"
         static let addToPortfolio = "AddAsset.AddToPortfolio"
+
     }
-    
+
     // MARK: - Asset Detail Screen
-    
+
     enum AssetDetail {
+
         static let marketData = "AssetDetail.MarketData"
         static let change24h = "AssetDetail.24hChange"
         static let marketCapRank = "AssetDetail.MarketCapRank"
@@ -167,11 +176,13 @@ enum LocalizedKey {
         static let removeFromPortfolio = "AssetDetail.RemoveFromPortfolio"
         static let deleteTitle = "AssetDetail.Delete.Title"
         static let deleteMessage = "AssetDetail.Delete.Message"
+
     }
-    
+
     // MARK: - Common
-    
+
     enum Common {
+
         static let ok = "Common.OK"
         static let cancel = "Common.Cancel"
         static let delete = "Common.Delete"
@@ -181,5 +192,7 @@ enum LocalizedKey {
         static let done = "Common.Done"
         static let save = "Common.Save"
         static let close = "Common.Close"
+
     }
+
 }

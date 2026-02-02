@@ -10,6 +10,10 @@ import SwiftUI
 struct RootView: View {
     @StateObject private var router = Router()
     @StateObject private var themeManager = ThemeManager.shared
+    @StateObject private var languageManager = LanguageManager.shared
+    
+    /// Force view refresh on language change
+    @State private var languageRefreshId = UUID()
     
     var body: some View {
         TabView {
@@ -21,7 +25,7 @@ struct RootView: View {
                     }
             }
             .tabItem {
-                Label("Portfolio", systemImage: "chart.pie.fill")
+                Label(LocalizedKey.Tab.portfolio.localized, systemImage: "chart.pie.fill")
             }
             
             #if os(iOS)
@@ -30,13 +34,13 @@ struct RootView: View {
                 MarketScreen()
             }
             .tabItem {
-                Label("Market", systemImage: "chart.bar.fill")
+                Label(LocalizedKey.Tab.market.localized, systemImage: "chart.bar.fill")
             }
             
             // Analytics Tab
             AnalyticsDashboardScreen()
                 .tabItem {
-                    Label("Analytics", systemImage: "chart.xyaxis.line")
+                    Label(LocalizedKey.Tab.analytics.localized, systemImage: "chart.xyaxis.line")
                 }
             
             // Watchlist Tab
@@ -44,7 +48,7 @@ struct RootView: View {
                 WatchlistScreen()
             }
             .tabItem {
-                Label("Watchlist", systemImage: "star.fill")
+                Label(LocalizedKey.Tab.watchlist.localized, systemImage: "star.fill")
             }
             
             // Settings Tab
@@ -52,13 +56,20 @@ struct RootView: View {
                 SettingsScreen()
             }
             .tabItem {
-                Label("Settings", systemImage: "gearshape.fill")
+                Label(LocalizedKey.Tab.settings.localized, systemImage: "gearshape.fill")
             }
             #endif
         }
+        .id(languageRefreshId)
         .environmentObject(router)
         .environmentObject(themeManager)
+        .environmentObject(languageManager)
+        .environment(\.locale, languageManager.currentLocale)
         .preferredColorScheme(themeManager.preferredColorScheme)
+        .onReceive(NotificationCenter.default.publisher(for: LanguageManager.languageDidChangeNotification)) { _ in
+            // Force view hierarchy refresh on language change
+            languageRefreshId = UUID()
+        }
     }
     
     @ViewBuilder
@@ -76,8 +87,8 @@ struct RootView: View {
         case .analytics:
             AnalyticsDashboardScreen()
         case .analyticsExport:
-            Text("Export Analytics")
-                .navigationTitle("Export")
+            Text(LocalizedKey.Analytics.export.localized)
+                .navigationTitle(LocalizedKey.Analytics.export.localized)
         case .settings:
             SettingsScreen()
         #else
@@ -104,4 +115,5 @@ struct RootView: View {
     RootView()
         .withContainer()
         .environmentObject(ThemeManager.shared)
+        .environmentObject(LanguageManager.shared)
 }

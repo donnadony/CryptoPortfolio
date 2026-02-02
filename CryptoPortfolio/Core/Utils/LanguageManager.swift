@@ -35,10 +35,11 @@ final class LanguageManager: ObservableObject {
     // MARK: - Language Enum
     
     enum Language: String, CaseIterable, Identifiable, Sendable {
+
         case english = "en"
         case spanish = "es"
         case system = "sys"
-        
+
         var id: String { rawValue }
         
         var displayName: String {

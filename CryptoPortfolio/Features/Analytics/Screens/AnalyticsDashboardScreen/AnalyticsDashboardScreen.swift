@@ -41,7 +41,7 @@ struct AnalyticsDashboardScreen: View {
                     .padding(.vertical, AppTheme.Spacing.sm)
                 }
             }
-            .navigationTitle("Analytics")
+            .navigationTitle(LocalizedKey.Analytics.title.localized)
             .navigationBarTitleDisplayMode(.large)
             .analyticsNavigationDestinations(router: router)
             .task {
@@ -59,18 +59,18 @@ struct AnalyticsDashboardScreen: View {
     private var performanceCard: some View {
         VStack(spacing: AppTheme.Spacing.md) {
             HStack {
-                Text("Performance")
+                Text(LocalizedKey.Analytics.performance.localized)
                     .font(AppTheme.Typography.headline)
                     .foregroundStyle(.primary)
                 Spacer()
-                Text(viewModel.selectedTimeframe.displayName)
+                Text(viewModel.selectedTimeframe.localizedDisplayName)
                     .font(AppTheme.Typography.caption)
                     .foregroundStyle(.secondary)
             }
             
             HStack(spacing: AppTheme.Spacing.xl) {
                 performanceMetric(
-                    title: "Total Return",
+                    title: LocalizedKey.Analytics.totalReturn.localized,
                     value: viewModel.formattedTotalReturn,
                     isPositive: viewModel.isTotalReturnPositive
                 )
@@ -79,7 +79,7 @@ struct AnalyticsDashboardScreen: View {
                     .frame(height: 40)
                 
                 performanceMetric(
-                    title: "24h Change",
+                    title: LocalizedKey.Analytics.change24h.localized,
                     value: viewModel.formatted24hChange,
                     isPositive: viewModel.is24hChangePositive
                 )
@@ -91,7 +91,7 @@ struct AnalyticsDashboardScreen: View {
                     Button {
                         viewModel.selectTimeframe(timeframe)
                     } label: {
-                        Text(timeframe.shortName)
+                        Text(timeframe.localizedShortName)
                             .font(AppTheme.Typography.caption)
                             .padding(.horizontal, AppTheme.Spacing.sm)
                             .padding(.vertical, AppTheme.Spacing.xs)
@@ -131,12 +131,12 @@ struct AnalyticsDashboardScreen: View {
     
     private var allocationCard: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text("Asset Allocation")
+            Text(LocalizedKey.Analytics.assetAllocation.localized)
                 .font(AppTheme.Typography.headline)
                 .foregroundStyle(.primary)
             
             if viewModel.allocations.isEmpty {
-                Text("No assets to display")
+                Text(LocalizedKey.Analytics.noAssets.localized)
                     .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -181,12 +181,12 @@ struct AnalyticsDashboardScreen: View {
     
     private var topPerformersSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text("Top Performers (24h)")
+            Text(LocalizedKey.Analytics.topPerformers.localized)
                 .font(AppTheme.Typography.headline)
                 .foregroundStyle(.primary)
             
             if viewModel.topPerformers.isEmpty {
-                Text("No data available")
+                Text(LocalizedKey.Analytics.noData.localized)
                     .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -219,26 +219,26 @@ struct AnalyticsDashboardScreen: View {
     
     private var quickActionsSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text("Quick Actions")
+            Text(LocalizedKey.Analytics.quickActions.localized)
                 .font(AppTheme.Typography.headline)
                 .foregroundStyle(.primary)
             
             HStack(spacing: AppTheme.Spacing.md) {
                 quickActionButton(
                     icon: "square.and.arrow.up",
-                    title: "Export",
+                    title: LocalizedKey.Analytics.export.localized,
                     action: { router.navigate(to: .export) }
                 )
                 
                 quickActionButton(
                     icon: "chart.bar.xaxis",
-                    title: "Compare",
+                    title: LocalizedKey.Analytics.compare.localized,
                     action: { /* Future feature */ }
                 )
                 
                 quickActionButton(
                     icon: "bell.badge",
-                    title: "Alerts",
+                    title: LocalizedKey.Analytics.alerts.localized,
                     action: { /* Future feature */ }
                 )
             }
@@ -274,6 +274,7 @@ struct AnalyticsDashboardScreen: View {
 #Preview {
     AnalyticsDashboardScreen()
         .withContainer()
+        .environmentObject(LanguageManager.shared)
 }
 
 #endif

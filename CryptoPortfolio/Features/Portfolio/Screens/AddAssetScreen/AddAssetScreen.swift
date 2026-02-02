@@ -44,17 +44,17 @@ struct AddAssetScreen: View {
                     .padding(AppTheme.Spacing.lg)
                 }
             }
-            .navigationTitle("Add Asset")
+            .navigationTitle(LocalizedKey.AddAsset.title.localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
+                    Button(LocalizedKey.Common.cancel.localized) {
                         dismiss()
                     }
                 }
             }
-            .alert("Error", isPresented: $showError) {
-                Button("OK") {}
+            .alert(LocalizedKey.Common.error.localized, isPresented: $showError) {
+                Button(LocalizedKey.Common.ok.localized) {}
             } message: {
                 if let error = viewModel.error {
                     Text(error.localizedDescription)
@@ -70,12 +70,12 @@ struct AddAssetScreen: View {
     
     private var symbolSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("Cryptocurrency")
+            Text(LocalizedKey.AddAsset.cryptocurrency.localized)
                 .font(AppTheme.Typography.subheadline)
                 .foregroundStyle(.secondary)
             
             HStack {
-                TextField("e.g. BTC", text: $viewModel.symbol)
+                TextField(LocalizedKey.AddAsset.symbolPlaceholder.localized, text: $viewModel.symbol)
                     .textFieldStyle(.roundedBorder)
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
@@ -89,7 +89,7 @@ struct AddAssetScreen: View {
                         ProgressView()
                             .controlSize(.small)
                     } else {
-                        Text("Fetch Price")
+                        Text(LocalizedKey.AddAsset.fetchPrice.localized)
                             .font(AppTheme.Typography.subheadline)
                     }
                 }
@@ -101,7 +101,7 @@ struct AddAssetScreen: View {
     
     private var amountSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("Amount")
+            Text(LocalizedKey.AddAsset.amount.localized)
                 .font(AppTheme.Typography.subheadline)
                 .foregroundStyle(.secondary)
             
@@ -116,7 +116,7 @@ struct AddAssetScreen: View {
     
     private var priceSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("Current Price")
+            Text(LocalizedKey.AddAsset.currentPrice.localized)
                 .font(AppTheme.Typography.subheadline)
                 .foregroundStyle(.secondary)
             
@@ -140,7 +140,7 @@ struct AddAssetScreen: View {
     
     private var totalValueSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
-            Text("Total Value")
+            Text(LocalizedKey.AddAsset.totalValue.localized)
                 .font(AppTheme.Typography.subheadline)
                 .foregroundStyle(.secondary)
             
@@ -168,7 +168,7 @@ struct AddAssetScreen: View {
                     ProgressView()
                         .tint(.white)
                 } else {
-                    Text("Add to Portfolio")
+                    Text(LocalizedKey.AddAsset.addToPortfolio.localized)
                 }
             }
             .font(AppTheme.Typography.headline)
@@ -189,5 +189,6 @@ struct AddAssetScreen: View {
 #Preview {
     AddAssetScreen()
         .withContainer()
+        .environmentObject(LanguageManager.shared)
 }
 #endif

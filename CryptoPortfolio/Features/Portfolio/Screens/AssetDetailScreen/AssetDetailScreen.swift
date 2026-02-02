@@ -55,22 +55,22 @@ struct AssetDetailScreen: View {
             }
         }
         .confirmationDialog(
-            "Delete Asset?",
+            LocalizedKey.AssetDetail.deleteTitle.localized,
             isPresented: $showDeleteConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Delete", role: .destructive) {
+            Button(LocalizedKey.Common.delete.localized, role: .destructive) {
                 Task {
                     try? await viewModel.deleteAsset()
                     dismiss()
                 }
             }
-            Button("Cancel", role: .cancel) {}
+            Button(LocalizedKey.Common.cancel.localized, role: .cancel) {}
         } message: {
-            Text("Are you sure you want to delete \(viewModel.asset.name) from your portfolio?")
+            Text(LocalizedKey.AssetDetail.deleteMessage.localized(with: viewModel.asset.name))
         }
-        .alert("Error", isPresented: $showError) {
-            Button("OK") {
+        .alert(LocalizedKey.Common.error.localized, isPresented: $showError) {
+            Button(LocalizedKey.Common.ok.localized) {
                 viewModel.clearError()
             }
         } message: {
@@ -109,13 +109,13 @@ struct AssetDetailScreen: View {
     
     private var priceSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text("Market Data")
+            Text(LocalizedKey.AssetDetail.marketData.localized)
                 .font(AppTheme.Typography.headline)
                 .foregroundStyle(.primary)
             
             HStack {
                 VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                    Text("24h Change")
+                    Text(LocalizedKey.AssetDetail.change24h.localized)
                         .font(AppTheme.Typography.caption)
                         .foregroundStyle(.secondary)
                     
@@ -127,7 +127,7 @@ struct AssetDetailScreen: View {
                 Spacer()
                 
                 VStack(alignment: .trailing, spacing: AppTheme.Spacing.xs) {
-                    Text("Market Cap Rank")
+                    Text(LocalizedKey.AssetDetail.marketCapRank.localized)
                         .font(AppTheme.Typography.caption)
                         .foregroundStyle(.secondary)
                     
@@ -143,7 +143,7 @@ struct AssetDetailScreen: View {
     
     private var statsSection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text("Statistics")
+            Text(LocalizedKey.AssetDetail.statistics.localized)
                 .font(AppTheme.Typography.headline)
                 .foregroundStyle(.primary)
             
@@ -151,25 +151,25 @@ struct AssetDetailScreen: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: AppTheme.Spacing.md) {
-                StatCard(title: "High (30d)", value: viewModel.formattedHighPrice)
-                StatCard(title: "Low (30d)", value: viewModel.formattedLowPrice)
-                StatCard(title: "Average (30d)", value: viewModel.formattedAveragePrice)
-                StatCard(title: "Market Cap", value: viewModel.marketCap)
+                StatCard(title: LocalizedKey.AssetDetail.high30d.localized, value: viewModel.formattedHighPrice)
+                StatCard(title: LocalizedKey.AssetDetail.low30d.localized, value: viewModel.formattedLowPrice)
+                StatCard(title: LocalizedKey.AssetDetail.average30d.localized, value: viewModel.formattedAveragePrice)
+                StatCard(title: LocalizedKey.AssetDetail.marketCap.localized, value: viewModel.marketCap)
             }
         }
     }
     
     private var priceHistorySection: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            Text("Price History (30 Days)")
+            Text(LocalizedKey.AssetDetail.priceHistory.localized)
                 .font(AppTheme.Typography.headline)
                 .foregroundStyle(.primary)
             
             if viewModel.priceHistory.isEmpty {
                 ContentUnavailableView {
-                    Label("No Data", systemImage: "chart.line.uptrend.xyaxis")
+                    Label(LocalizedKey.AssetDetail.noDataTitle.localized, systemImage: "chart.line.uptrend.xyaxis")
                 } description: {
-                    Text("Price history is not available")
+                    Text(LocalizedKey.AssetDetail.noDataMessage.localized)
                 }
                 .frame(height: 200)
             } else {
@@ -187,7 +187,7 @@ struct AssetDetailScreen: View {
         }) {
             HStack {
                 Image(systemName: "trash")
-                Text("Remove from Portfolio")
+                Text(LocalizedKey.AssetDetail.removeFromPortfolio.localized)
             }
             .font(AppTheme.Typography.headline)
             .foregroundColor(AppTheme.Colors.error)
@@ -271,5 +271,6 @@ struct SimplePriceChart: View {
         )
     }
     .withContainer()
+    .environmentObject(LanguageManager.shared)
 }
 #endif

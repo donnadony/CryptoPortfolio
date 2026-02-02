@@ -43,7 +43,7 @@ struct PortfolioScreen: View {
                     }
                 }
             }
-            .navigationTitle("Portfolio")
+            .navigationTitle(LocalizedKey.Portfolio.title.localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -74,8 +74,8 @@ struct PortfolioScreen: View {
                     await viewModel.refreshAssets()
                 }
             }
-            .alert("Error", isPresented: .constant(viewModel.error != nil)) {
-                Button("OK") {
+            .alert(LocalizedKey.Common.error.localized, isPresented: .constant(viewModel.error != nil)) {
+                Button(LocalizedKey.Common.ok.localized) {
                     viewModel.clearError()
                 }
             } message: {
@@ -84,18 +84,18 @@ struct PortfolioScreen: View {
                 }
             }
             .confirmationDialog(
-                "Delete Asset?",
+                LocalizedKey.Portfolio.deleteTitle.localized,
                 isPresented: $showDeleteConfirmation,
                 presenting: assetToDelete
             ) { asset in
-                Button("Delete", role: .destructive) {
+                Button(LocalizedKey.Common.delete.localized, role: .destructive) {
                     Task {
                         await viewModel.deleteAsset(asset)
                     }
                 }
-                Button("Cancel", role: .cancel) {}
+                Button(LocalizedKey.Common.cancel.localized, role: .cancel) {}
             } message: { asset in
-                Text("Are you sure you want to delete \(asset.name) from your portfolio?")
+                Text(LocalizedKey.Portfolio.deleteMessage.localized(with: asset.name))
             }
         }
     }
@@ -106,7 +106,7 @@ struct PortfolioScreen: View {
         VStack(spacing: AppTheme.Spacing.lg) {
             ProgressView()
                 .scaleEffect(1.5)
-            Text("Loading Portfolio...")
+            Text(LocalizedKey.Portfolio.loading.localized)
                 .font(AppTheme.Typography.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -121,7 +121,7 @@ struct PortfolioScreen: View {
                 .font(.system(size: 48))
                 .foregroundStyle(AppTheme.Colors.warning)
             
-            Text("Unable to Load Portfolio")
+            Text(LocalizedKey.Portfolio.errorTitle.localized)
                 .font(AppTheme.Typography.title3)
             
             Text(error.localizedDescription)
@@ -130,7 +130,7 @@ struct PortfolioScreen: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
             
-            Button("Try Again") {
+            Button(LocalizedKey.Portfolio.tryAgain.localized) {
                 Task {
                     await viewModel.loadAssets()
                 }
@@ -151,11 +151,11 @@ struct PortfolioScreen: View {
                 .foregroundStyle(AppTheme.Colors.secondary.opacity(0.5))
             
             VStack(spacing: AppTheme.Spacing.md) {
-                Text("No Assets Yet")
+                Text(LocalizedKey.Portfolio.emptyTitle.localized)
                     .font(AppTheme.Typography.title2)
                     .foregroundStyle(.primary)
                 
-                Text("Add your first cryptocurrency to start tracking your portfolio")
+                Text(LocalizedKey.Portfolio.emptyMessage.localized)
                     .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -165,7 +165,7 @@ struct PortfolioScreen: View {
             Button(action: { showAddAsset = true }) {
                 HStack(spacing: AppTheme.Spacing.sm) {
                     Image(systemName: "plus")
-                    Text("Add Asset")
+                    Text(LocalizedKey.Portfolio.addAsset.localized)
                 }
                 .font(AppTheme.Typography.headline)
                 .foregroundColor(.white)
@@ -200,7 +200,7 @@ struct PortfolioScreen: View {
                             assetToDelete = asset
                             showDeleteConfirmation = true
                         } label: {
-                            Label("Delete", systemImage: "trash")
+                            Label(LocalizedKey.Common.delete.localized, systemImage: "trash")
                         }
                     }
                 }
@@ -212,7 +212,7 @@ struct PortfolioScreen: View {
     
     private var totalValueCard: some View {
         VStack(spacing: AppTheme.Spacing.md) {
-            Text("Total Value")
+            Text(LocalizedKey.Portfolio.totalValue.localized)
                 .font(AppTheme.Typography.subheadline)
                 .foregroundStyle(.secondary)
             
@@ -287,5 +287,6 @@ struct AssetRow: View {
 #Preview {
     PortfolioScreen()
         .withContainer()
+        .environmentObject(LanguageManager.shared)
 }
 #endif

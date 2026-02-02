@@ -31,7 +31,7 @@ struct WatchlistScreen: View {
                     }
                 }
             }
-            .navigationTitle("Watchlist")
+            .navigationTitle(LocalizedKey.Watchlist.title.localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -48,8 +48,8 @@ struct WatchlistScreen: View {
             .task {
                 await viewModel.loadItems()
             }
-            .alert("Error", isPresented: $showError) {
-                Button("OK") {
+            .alert(LocalizedKey.Common.error.localized, isPresented: $showError) {
+                Button(LocalizedKey.Common.ok.localized) {
                     viewModel.clearError()
                 }
             } message: {
@@ -72,11 +72,11 @@ struct WatchlistScreen: View {
                 .foregroundStyle(AppTheme.Colors.secondary.opacity(0.5))
             
             VStack(spacing: AppTheme.Spacing.md) {
-                Text("No Favorites Yet")
+                Text(LocalizedKey.Watchlist.emptyTitle.localized)
                     .font(AppTheme.Typography.title2)
                     .foregroundStyle(.primary)
                 
-                Text("Add cryptocurrencies to your watchlist to track them easily")
+                Text(LocalizedKey.Watchlist.emptyMessage.localized)
                     .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -86,7 +86,7 @@ struct WatchlistScreen: View {
             Button(action: { showAddSheet = true }) {
                 HStack(spacing: AppTheme.Spacing.sm) {
                     Image(systemName: "magnifyingglass")
-                    Text("Browse Market")
+                    Text(LocalizedKey.Watchlist.browseMarket.localized)
                 }
                 .font(AppTheme.Typography.headline)
                 .foregroundColor(.white)
@@ -183,5 +183,6 @@ struct WatchlistCard: View {
 #Preview {
     WatchlistScreen()
         .withContainer()
+        .environmentObject(LanguageManager.shared)
 }
 #endif

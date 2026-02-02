@@ -31,12 +31,12 @@ struct MarketScreen: View {
                     }
                 }
             }
-            .navigationTitle("Market")
+            .navigationTitle(LocalizedKey.Market.title.localized)
             .navigationBarTitleDisplayMode(.large)
             .searchable(
                 text: $viewModel.searchText,
                 placement: .navigationBarDrawer(displayMode: .always),
-                prompt: "Search cryptocurrencies"
+                prompt: LocalizedKey.Market.searchPrompt.localized
             )
             .task {
                 await viewModel.loadMarketData()
@@ -44,8 +44,8 @@ struct MarketScreen: View {
             .refreshable {
                 await viewModel.loadMarketData()
             }
-            .alert("Error", isPresented: $showError) {
-                Button("OK") {
+            .alert(LocalizedKey.Common.error.localized, isPresented: $showError) {
+                Button(LocalizedKey.Common.ok.localized) {
                     viewModel.clearError()
                 }
             } message: {
@@ -63,7 +63,7 @@ struct MarketScreen: View {
         VStack(spacing: AppTheme.Spacing.md) {
             ProgressView()
                 .controlSize(.large)
-            Text("Loading market data...")
+            Text(LocalizedKey.Market.loading.localized)
                 .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
         }
@@ -75,7 +75,7 @@ struct MarketScreen: View {
             Image(systemName: "chart.bar")
                 .font(.system(size: 48))
                 .foregroundStyle(.secondary)
-            Text("No market data available")
+            Text(LocalizedKey.Market.emptyTitle.localized)
                 .font(AppTheme.Typography.body)
                 .foregroundStyle(.secondary)
         }
@@ -174,5 +174,6 @@ struct MarketRow: View {
 #Preview {
     MarketScreen()
         .withContainer()
+        .environmentObject(LanguageManager.shared)
 }
 #endif

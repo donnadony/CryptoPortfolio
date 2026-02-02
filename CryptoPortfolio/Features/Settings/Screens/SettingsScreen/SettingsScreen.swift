@@ -10,7 +10,11 @@ import SwiftUI
 #if os(iOS)
 struct SettingsScreen: View {
     @StateObject private var viewModel: SettingsViewModel
+    @EnvironmentObject private var languageManager: LanguageManager
     @State private var showError = false
+    
+    /// Force view refresh on language change
+    @State private var refreshId = UUID()
     
     init() {
         _viewModel = StateObject(wrappedValue: Container.shared.makeSettingsViewModel())
@@ -23,8 +27,9 @@ struct SettingsScreen: View {
                 
                 Form {
                     // Appearance Section
-                    Section("Appearance") {
-                        Picker("Theme", selection: Binding(
+                    Section(LocalizedKey.Settings.appearance.localized) {
+                        // Theme Picker
+                        Picker(LocalizedKey.Settings.theme.localized, selection: Binding(
                             get: { viewModel.settings.theme },
                             set: { newValue in
                                 Task {
@@ -33,15 +38,32 @@ struct SettingsScreen: View {
                             }
                         )) {
                             ForEach(viewModel.availableThemes, id: \.self) { theme in
-                                Text(viewModel.themeNames[theme] ?? theme)
+                                Text(localizedThemeName(theme))
                                     .tag(theme)
+                            }
+                        }
+                        
+                        // Language Picker
+                        Picker(LocalizedKey.Settings.language.localized, selection: Binding(
+                            get: { languageManager.currentLanguage },
+                            set: { newLanguage in
+                                languageManager.setLanguage(newLanguage)
+                                refreshId = UUID()
+                            }
+                        )) {
+                            ForEach(LanguageManager.Language.allCases) { language in
+                                HStack {
+                                    Text(language.icon)
+                                    Text(language.displayName)
+                                }
+                                .tag(language)
                             }
                         }
                     }
                     
                     // Currency Section
-                    Section("Currency") {
-                        Picker("Currency", selection: Binding(
+                    Section(LocalizedKey.Settings.currency.localized) {
+                        Picker(LocalizedKey.Settings.currency.localized, selection: Binding(
                             get: { viewModel.settings.currency },
                             set: { newValue in
                                 Task {
@@ -58,8 +80,8 @@ struct SettingsScreen: View {
                     }
                     
                     // Notifications Section
-                    Section("Notifications") {
-                        Toggle("Enable Notifications", isOn: Binding(
+                    Section(LocalizedKey.Settings.notifications.localized) {
+                        Toggle(LocalizedKey.Settings.enableNotifications.localized, isOn: Binding(
                             get: { viewModel.settings.notificationsEnabled },
                             set: { _ in
                                 Task {
@@ -70,30 +92,33 @@ struct SettingsScreen: View {
                     }
                     
                     // About Section
-                    Section("About") {
+                    Section(LocalizedKey.Settings.about.localized) {
                         HStack {
-                            Text("Version")
+                            Text(LocalizedKey.Settings.version.localized)
                             Spacer()
                             Text("1.0.0")
                                 .foregroundStyle(.secondary)
                         }
                         
-                        Button("Reset to Defaults") {
+                        Button(LocalizedKey.Settings.resetDefaults.localized) {
                             Task {
                                 await viewModel.resetToDefaults()
+                                languageManager.setLanguage(.system)
+                                refreshId = UUID()
                             }
                         }
                         .foregroundStyle(AppTheme.Colors.error)
                     }
                 }
             }
-            .navigationTitle("Settings")
+            .id(refreshId)
+            .navigationTitle(LocalizedKey.Settings.title.localized)
             .navigationBarTitleDisplayMode(.large)
             .task {
                 await viewModel.loadSettings()
             }
-            .alert("Error", isPresented: $showError) {
-                Button("OK") {
+            .alert(LocalizedKey.Common.error.localized, isPresented: $showError) {
+                Button(LocalizedKey.Common.ok.localized) {
                     viewModel.clearError()
                 }
             } message: {
@@ -106,6 +131,20 @@ struct SettingsScreen: View {
             }
         }
     }
+    
+    /// Get localized theme name
+    private func localizedThemeName(_ theme: String) -> String {
+        switch theme {
+        case "light":
+            return LocalizedKey.Settings.themeLight.localized
+        case "dark":
+            return LocalizedKey.Settings.themeDark.localized
+        case "system":
+            return LocalizedKey.Settings.themeSystem.localized
+        default:
+            return theme.capitalized
+        }
+    }
 }
 
 // MARK: - Preview
@@ -113,5 +152,6 @@ struct SettingsScreen: View {
 #Preview {
     SettingsScreen()
         .withContainer()
+        .environmentObject(LanguageManager.shared)
 }
 #endif

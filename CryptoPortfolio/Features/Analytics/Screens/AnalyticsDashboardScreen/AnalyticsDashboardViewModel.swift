@@ -12,12 +12,13 @@ import Combine
 // MARK: - Analytics Timeframe
 
 enum AnalyticsTimeframe: String, CaseIterable, Sendable {
+
     case day = "24h"
     case week = "7d"
     case month = "30d"
     case year = "1y"
     case all = "all"
-    
+
     var displayName: String {
         switch self {
         case .day: return "Last 24 Hours"
@@ -28,7 +29,27 @@ enum AnalyticsTimeframe: String, CaseIterable, Sendable {
         }
     }
     
+    var localizedDisplayName: String {
+        switch self {
+        case .day: return LocalizedKey.Analytics.last24Hours.localized
+        case .week: return LocalizedKey.Analytics.last7Days.localized
+        case .month: return LocalizedKey.Analytics.last30Days.localized
+        case .year: return LocalizedKey.Analytics.lastYear.localized
+        case .all: return LocalizedKey.Analytics.allTime.localized
+        }
+    }
+    
     var shortName: String { rawValue.uppercased() }
+    
+    var localizedShortName: String {
+        switch self {
+        case .day: return LocalizedKey.Analytics.day.localized
+        case .week: return LocalizedKey.Analytics.week.localized
+        case .month: return LocalizedKey.Analytics.month.localized
+        case .year: return LocalizedKey.Analytics.year.localized
+        case .all: return LocalizedKey.Analytics.all.localized
+        }
+    }
 }
 
 // MARK: - Asset Allocation

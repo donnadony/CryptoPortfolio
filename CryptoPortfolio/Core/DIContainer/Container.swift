@@ -191,6 +191,18 @@ extension Container {
         )
     }
     
+    /// Returns the shared LanguageManager instance
+    @MainActor
+    func makeLanguageManager() -> LanguageManager {
+        LanguageManager.shared
+    }
+    
+    /// Returns the shared ThemeManager instance
+    @MainActor
+    func makeThemeManager() -> ThemeManager {
+        ThemeManager.shared
+    }
+    
     // MARK: - Generic Resolve
     
     /// Resolve any type from the container
