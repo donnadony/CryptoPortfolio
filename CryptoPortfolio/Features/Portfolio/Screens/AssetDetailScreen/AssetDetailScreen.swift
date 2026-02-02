@@ -2,7 +2,7 @@
 //  AssetDetailScreen.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import SwiftUI
@@ -152,7 +152,7 @@ struct AssetDetailScreen: View {
                         .foregroundColor(.white)
                 }
                 .frame(width: 50, height: 50)
-                .background(Color(hex: "#F7931A"))
+                .background(Color.brandPrimary)
                 .cornerRadius(10)
             }
             
@@ -192,7 +192,7 @@ struct AssetDetailScreen: View {
                     
                     Text(detailViewModel.asset.formattedValue)
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(Color(hex: "#F7931A"))
+                        .foregroundColor(Color.brandPrimary)
                 }
             }
         }
@@ -269,7 +269,7 @@ struct AssetDetailScreen: View {
                     
                     Text(detailViewModel.asset.formattedValue)
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(Color(hex: "#F7931A"))
+                        .foregroundColor(Color.brandPrimary)
                 }
             }
         }

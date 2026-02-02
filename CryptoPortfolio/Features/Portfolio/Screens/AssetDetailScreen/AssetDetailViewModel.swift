@@ -2,7 +2,7 @@
 //  AssetDetailViewModel.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
@@ -126,7 +126,7 @@ class AssetDetailViewModel: ObservableObject {
               let cap = marketData.marketCap else {
             return "N/A"
         }
-        return String(format: "$%.2B", cap)
+        return String(format: "$%.2fB", cap)
     }
     
     var marketCapRank: String {
@@ -143,7 +143,7 @@ class AssetDetailViewModel: ObservableObject {
             return "N/A"
         }
         let sign = change >= 0 ? "+" : ""
-        return String(format: "%s%.2f%%", sign, change)
+        return String(format: "%@%.2f%%", sign, change)
     }
     
     var isPricePositive24h: Bool {

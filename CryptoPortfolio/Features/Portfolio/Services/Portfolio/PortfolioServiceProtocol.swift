@@ -2,12 +2,12 @@
 //  PortfolioServiceProtocol.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
 
-protocol PortfolioServiceProtocol {
+protocol PortfolioServiceProtocol: Sendable {
     /// Fetch all assets from local storage
     func fetchAssets() async throws -> [Asset]
     

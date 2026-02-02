@@ -2,25 +2,28 @@
 //  MarketService.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
 
-class MarketService: MarketServiceProtocol {
+final class MarketService: MarketServiceProtocol, @unchecked Sendable {
     // MARK: - Properties
     
     private let apiService: APIServiceProtocol
     
     // MARK: - Initialization
     
-    nonisolated init(apiService: APIServiceProtocol = APIService.shared) {
+    init(apiService: APIServiceProtocol = APIService.shared) {
         self.apiService = apiService
     }
     
     // MARK: - MarketServiceProtocol
     
     func fetchMarketData(limit: Int = 50) async throws -> [CryptoMarket] {
+        // Apply rate limiting
+        await RateLimiter.shared.waitIfNeeded()
+        
         let queryItems = [
             URLQueryItem(name: "vs_currency", value: "usd"),
             URLQueryItem(name: "order", value: "market_cap_desc"),
@@ -29,6 +32,8 @@ class MarketService: MarketServiceProtocol {
             URLQueryItem(name: "locale", value: "en")
         ]
         
+        print("🟡 [MarketService] Requesting /coins/markets with limit: \(limit)")
+        
         let cryptos: [CryptoMarket] = try await apiService.request(
             endpoint: "/coins/markets",
             method: .get,
@@ -36,6 +41,7 @@ class MarketService: MarketServiceProtocol {
             queryItems: queryItems
         )
         
+        print("🟢 [MarketService] Fetched \(cryptos.count) cryptos")
         return cryptos
     }
     
@@ -44,9 +50,14 @@ class MarketService: MarketServiceProtocol {
             return []
         }
         
+        // Apply rate limiting
+        await RateLimiter.shared.waitIfNeeded()
+        
         let queryItems = [
             URLQueryItem(name: "query", value: query)
         ]
+        
+        print("🟡 [MarketService] Requesting /search with query: '\(query)'")
         
         let response: SearchResponse = try await apiService.request(
             endpoint: "/search",
@@ -55,6 +66,7 @@ class MarketService: MarketServiceProtocol {
             queryItems: queryItems
         )
         
+        print("🟢 [MarketService] Search returned \(response.coins.count) coins")
         return response.coins
     }
     

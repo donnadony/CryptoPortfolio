@@ -2,7 +2,7 @@
 //  RootView.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import SwiftUI
@@ -27,6 +27,13 @@ struct RootView: View {
             }
             .tabItem {
                 Label("Market", systemImage: "chart.bar.fill")
+            }
+            
+            NavigationStack {
+                WatchlistScreen()
+            }
+            .tabItem {
+                Label("Watchlist", systemImage: "star.fill")
             }
             
             NavigationStack {

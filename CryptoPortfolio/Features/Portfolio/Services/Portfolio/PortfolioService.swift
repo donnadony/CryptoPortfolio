@@ -2,12 +2,12 @@
 //  PortfolioService.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
 
-class PortfolioService: PortfolioServiceProtocol {
+final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
     // MARK: - Properties
     
     private let apiService: APIServiceProtocol
@@ -18,7 +18,7 @@ class PortfolioService: PortfolioServiceProtocol {
     
     // MARK: - Initialization
     
-    nonisolated init(
+    init(
         apiService: APIServiceProtocol = APIService.shared,
         userDefaults: UserDefaults = .standard
     ) {
@@ -73,7 +73,21 @@ class PortfolioService: PortfolioServiceProtocol {
     }
     
     func fetchPrice(symbol: String) async throws -> Double {
-        let query = symbol.lowercased()
+        // Map common symbols to CoinGecko IDs
+        let idMapping: [String: String] = [
+            "btc": "bitcoin",
+            "eth": "ethereum",
+            "xrp": "ripple",
+            "sol": "solana",
+            "ada": "cardano",
+            "dot": "polkadot",
+            "doge": "dogecoin",
+            "bnb": "binancecoin",
+            "usdt": "tether",
+            "usdc": "usd-coin"
+        ]
+        
+        let query = idMapping[symbol.lowercased()] ?? symbol.lowercased()
         let endpoint = "/simple/price"
         
         let queryItems = [
@@ -81,22 +95,7 @@ class PortfolioService: PortfolioServiceProtocol {
             URLQueryItem(name: "vs_currencies", value: "usd")
         ]
         
-        // Create a custom response structure for this specific call
-        struct PriceResponse: Codable {
-            let btc: [String: Double]?
-            let eth: [String: Double]?
-            let xrp: [String: Double]?
-            
-            subscript(key: String) -> [String: Double]? {
-                let mirror = Mirror(reflecting: self)
-                for child in mirror.children {
-                    if child.label == key.lowercased() {
-                        return child.value as? [String: Double]
-                    }
-                }
-                return nil
-            }
-        }
+        print("🟡 [PortfolioService] Fetching price for '\(symbol)' -> '\(query)'")
         
         let response: [String: [String: Double]] = try await apiService.request(
             endpoint: endpoint,
@@ -105,11 +104,23 @@ class PortfolioService: PortfolioServiceProtocol {
             queryItems: queryItems
         )
         
-        if let priceData = response[query.lowercased()],
+        print("🟢 [PortfolioService] Price response keys: \(response.keys)")
+        
+        if let priceData = response[query],
            let price = priceData["usd"] {
+            print("🟢 [PortfolioService] Found price for '\(query)': $\(price)")
             return price
         }
         
+        // Try to find price with any key (fallback)
+        if let firstKey = response.keys.first,
+           let priceData = response[firstKey],
+           let price = priceData["usd"] {
+            print("🟡 [PortfolioService] Found price with fallback key '\(firstKey)': $\(price)")
+            return price
+        }
+        
+        print("🔴 [PortfolioService] Price not found for '\(query)'. Available keys: \(response.keys)")
         throw NetworkError.notFound
     }
     

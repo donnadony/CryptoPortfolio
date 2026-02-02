@@ -2,7 +2,7 @@
 //  CryptoMarket.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
@@ -15,18 +15,13 @@ struct CryptoMarket: Codable, Identifiable, Hashable {
     let currentPrice: Double
     let marketCap: Double?
     let marketCapRank: Int?
-    let priceChange24h: Double?
+    let priceChangePercentage24h: Double?
     let image: String?
     
     // MARK: - Computed Properties
     
-    var priceChangePercentage24h: Double? {
-        guard let priceChange = priceChange24h else { return nil }
-        return priceChange
-    }
-    
     var isPositiveChange: Bool {
-        guard let change = priceChange24h else { return false }
+        guard let change = priceChangePercentage24h else { return false }
         return change >= 0
     }
     
@@ -40,7 +35,7 @@ struct CryptoMarket: Codable, Identifiable, Hashable {
     }
     
     var formattedPriceChange: String? {
-        guard let change = priceChange24h else { return nil }
+        guard let change = priceChangePercentage24h else { return nil }
         let sign = change >= 0 ? "+" : ""
         return String(format: "%@%.2f%%", sign, change)
     }
@@ -72,7 +67,7 @@ struct CryptoMarket: Codable, Identifiable, Hashable {
         case currentPrice = "current_price"
         case marketCap = "market_cap"
         case marketCapRank = "market_cap_rank"
-        case priceChange24h = "price_change_24h"
+        case priceChangePercentage24h = "price_change_percentage_24h"
         case image
     }
 }
@@ -90,31 +85,17 @@ struct CryptoMarketResponse: Codable {
 // MARK: - Search Result Model
 
 struct CryptoSearchResult: Codable, Identifiable {
-    struct MarketData: Codable {
-        let id: String
-        let name: String
-        let symbol: String
-        let marketCapRank: Int?
-        
-        enum CodingKeys: String, CodingKey {
-            case id
-            case name
-            case symbol
-            case marketCapRank = "market_cap_rank"
-        }
-    }
-    
     let id: String
     let name: String
     let symbol: String
-    let marketData: MarketData?
+    let marketCapRank: Int?
     let thumb: String?
     
     enum CodingKeys: String, CodingKey {
         case id
         case name
         case symbol
-        case marketData = "market_data"
+        case marketCapRank = "market_cap_rank"
         case thumb
     }
 }

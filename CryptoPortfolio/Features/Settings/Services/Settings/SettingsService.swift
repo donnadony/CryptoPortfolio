@@ -2,14 +2,14 @@
 //  SettingsService.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
 
 /// Implementation of SettingsServiceProtocol
 /// Uses UserDefaults to persist application settings
-class SettingsService: SettingsServiceProtocol {
+final class SettingsService: SettingsServiceProtocol, @unchecked Sendable {
     // MARK: - Constants
     
     private enum UserDefaultsKeys {
@@ -23,7 +23,7 @@ class SettingsService: SettingsServiceProtocol {
     
     // MARK: - Initialization
     
-    nonisolated init(userDefaults: UserDefaults = .standard) {
+    init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
     }
     

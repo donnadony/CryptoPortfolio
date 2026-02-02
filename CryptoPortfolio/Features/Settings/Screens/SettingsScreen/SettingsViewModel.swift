@@ -2,7 +2,7 @@
 //  SettingsViewModel.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
@@ -51,6 +51,11 @@ class SettingsViewModel: ObservableObject {
     func updateTheme(_ theme: String) {
         settings.theme = theme
         service.saveSettings(settings)
+        
+        // Apply theme globally
+        if let themeEnum = ThemeManager.Theme(rawValue: theme) {
+            ThemeManager.shared.setTheme(themeEnum)
+        }
     }
     
     /// Toggle notifications setting
@@ -63,6 +68,9 @@ class SettingsViewModel: ObservableObject {
     func resetToDefaults() {
         settings = AppSettings.default
         service.resetSettings()
+        
+        // Reset theme
+        ThemeManager.shared.setTheme(.system)
     }
     
     /// Get current settings

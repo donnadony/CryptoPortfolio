@@ -2,7 +2,7 @@
 //  AddAssetScreen.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import SwiftUI
@@ -145,7 +145,7 @@ struct AddAssetScreen: View {
                     Text(viewModel.formattedCurrentPrice)
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(Color(hex: "#F7931A"))
+                        .foregroundColor(Color.brandPrimary)
                 }
                 
                 Spacer()
@@ -251,7 +251,7 @@ struct AddAssetScreen: View {
                 
                 Text(viewModel.formattedTotalValue)
                     .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(Color(hex: "#F7931A"))
+                    .foregroundColor(Color.brandPrimary)
             }
         }
         .padding(16)

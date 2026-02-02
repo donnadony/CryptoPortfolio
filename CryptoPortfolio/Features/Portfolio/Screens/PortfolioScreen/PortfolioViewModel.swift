@@ -2,7 +2,7 @@
 //  PortfolioViewModel.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
@@ -175,10 +175,10 @@ class PortfolioViewModel: ObservableObject {
     }
     
     var formattedGainLoss: String {
-        String(format: "%s$%.2f", isPositiveGainLoss ? "+" : "", abs(gainLoss))
+        String(format: "%@$%.2f", isPositiveGainLoss ? "+" : "", abs(gainLoss))
     }
     
     var formattedGainLossPercentage: String {
-        String(format: "%s%.2f%%", isPositiveGainLoss ? "+" : "", abs(gainLossPercentage))
+        String(format: "%@%.2f%%", isPositiveGainLoss ? "+" : "", abs(gainLossPercentage))
     }
 }

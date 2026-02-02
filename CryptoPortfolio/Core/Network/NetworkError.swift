@@ -2,7 +2,7 @@
 //  NetworkError.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
@@ -14,10 +14,12 @@ enum NetworkError: LocalizedError {
     case decodingError(Error)
     case encodingError(Error)
     case serverError(statusCode: Int)
+    case rateLimited(retryAfter: Int?)
     case unauthorized
     case forbidden
     case notFound
     case unknown(Error)
+    case networkError(Error)
     
     var errorDescription: String? {
         switch self {
@@ -27,12 +29,17 @@ enum NetworkError: LocalizedError {
             return "Invalid response from server"
         case .noData:
             return "No data received from server"
-        case .decodingError(let error):
+        case .decodingError(let error), .networkError(let error):
             return "Failed to decode response: \(error.localizedDescription)"
         case .encodingError(let error):
             return "Failed to encode request: \(error.localizedDescription)"
         case .serverError(let statusCode):
             return "Server error with status code: \(statusCode)"
+        case .rateLimited(let retryAfter):
+            if let seconds = retryAfter {
+                return "Rate limit exceeded. Please try again in \(seconds) seconds."
+            }
+            return "Rate limit exceeded. Please try again later."
         case .unauthorized:
             return "Unauthorized - Please log in"
         case .forbidden:

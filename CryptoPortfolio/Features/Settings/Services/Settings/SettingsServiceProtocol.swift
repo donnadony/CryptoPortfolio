@@ -2,14 +2,14 @@
 //  SettingsServiceProtocol.swift
 //  CryptoPortfolio
 //
-//  Created on 31/01/2026.
+//  Created by Donnadony Mollo on 31/01/2026.
 //
 
 import Foundation
 
 /// Protocol for managing application settings
 /// Handles loading, saving, and resetting user preferences
-protocol SettingsServiceProtocol: AnyObject {
+protocol SettingsServiceProtocol: AnyObject, Sendable {
     /// Load current settings from persistent storage
     /// - Returns: Loaded settings or default settings
     func loadSettings() -> AppSettings
