@@ -2,7 +2,7 @@
 //  RootView.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import SwiftUI
@@ -63,6 +63,9 @@ struct RootView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     RootView()
+        .withContainer()
 }

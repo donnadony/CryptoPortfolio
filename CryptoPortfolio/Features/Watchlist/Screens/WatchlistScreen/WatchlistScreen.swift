@@ -2,15 +2,20 @@
 //  WatchlistScreen.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import SwiftUI
 
 struct WatchlistScreen: View {
     @Environment(\.colorScheme) var colorScheme
-    @StateObject private var viewModel = WatchlistViewModel()
+    @StateObject private var viewModel: WatchlistViewModel
     @State private var showAddSheet = false
+    @State private var showError = false
+    
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.makeWatchlistViewModel())
+    }
     
     var body: some View {
         NavigationStack {
@@ -40,7 +45,19 @@ struct WatchlistScreen: View {
                 MarketScreen()
             }
             .task {
-                viewModel.loadItems()
+                await viewModel.loadItems()
+            }
+            .alert("Error", isPresented: $showError) {
+                Button("OK") {
+                    viewModel.clearError()
+                }
+            } message: {
+                if let error = viewModel.error {
+                    Text(error.localizedDescription)
+                }
+            }
+            .onChange(of: viewModel.error) { _, newError in
+                showError = newError != nil
             }
         }
     }
@@ -92,7 +109,11 @@ struct WatchlistScreen: View {
                 ForEach(viewModel.items) { item in
                     WatchlistCard(
                         item: item,
-                        onDelete: { viewModel.removeItem(id: item.id) }
+                        onDelete: {
+                            Task {
+                                await viewModel.removeItem(id: item.id)
+                            }
+                        }
                     )
                 }
             }
@@ -160,4 +181,5 @@ struct WatchlistCard: View {
 
 #Preview {
     WatchlistScreen()
+        .withContainer()
 }

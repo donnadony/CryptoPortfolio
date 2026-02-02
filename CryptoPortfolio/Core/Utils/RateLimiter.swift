@@ -2,19 +2,18 @@
 //  RateLimiter.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
 
 /// Rate limiter to prevent exceeding API limits
 actor RateLimiter {
-    static let shared = RateLimiter()
     
     private var lastRequestTime: Date?
     private let minimumInterval: TimeInterval = 1.2 // Seconds between requests
     
-    private init() {}
+    init() {}
     
     /// Wait if needed to respect rate limits
     func waitIfNeeded() async {

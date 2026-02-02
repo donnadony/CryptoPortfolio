@@ -2,161 +2,177 @@
 //  PortfolioViewModel.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
 import Combine
 
 @MainActor
-class PortfolioViewModel: ObservableObject {
+final class PortfolioViewModel: ObservableObject {
+    
     // MARK: - Published Properties
     
     @Published var assets: [Asset] = []
-    @Published var isLoading = false
-    @Published var isRefreshing = false
-    @Published var error: String?
     @Published var totalValue: Double = 0
     @Published var gainLoss: Double = 0
     @Published var gainLossPercentage: Double = 0
     
-    // MARK: - Dependencies
+    /// Unified view state
+    @Published var state: PortfolioViewState = .idle
     
-    private let service: PortfolioServiceProtocol
+    /// Typed error (replaces String? error)
+    @Published var error: DomainError?
+    
+    /// Loading state derived from state
+    var isLoading: Bool { state.isLoading }
+    var isRefreshing: Bool { 
+        if case .loading = state { return true }
+        return false
+    }
+    
+    // MARK: - Dependencies (UseCases)
+    
+    private let getAssetsUseCase: any GetAssetsUseCaseProtocol
+    private let calculatePortfolioTotalUseCase: any CalculatePortfolioTotalUseCaseProtocol
+    private let deleteAssetUseCase: any DeleteAssetUseCaseProtocol
+    
+    // MARK: - Task Management
+    
+    private var loadTask: Task<Void, Never>?
+    private var refreshTask: Task<Void, Never>?
     
     // MARK: - Initialization
     
-    init(service: PortfolioServiceProtocol = PortfolioService()) {
-        self.service = service
+    init(
+        getAssetsUseCase: any GetAssetsUseCaseProtocol,
+        calculatePortfolioTotalUseCase: any CalculatePortfolioTotalUseCaseProtocol,
+        deleteAssetUseCase: any DeleteAssetUseCaseProtocol
+    ) {
+        self.getAssetsUseCase = getAssetsUseCase
+        self.calculatePortfolioTotalUseCase = calculatePortfolioTotalUseCase
+        self.deleteAssetUseCase = deleteAssetUseCase
     }
     
     // MARK: - Public Methods
     
-    /// Load all portfolio assets
+    /// Load all portfolio assets with cancellation support
     func loadAssets() async {
-        isLoading = true
-        error = nil
-        defer { isLoading = false }
+        // Cancel any existing load task
+        loadTask?.cancel()
         
-        do {
-            let summary = try await service.calculatePortfolioTotal()
-            self.assets = summary.assets
-            self.totalValue = summary.totalValue
-            self.gainLoss = summary.gainLoss
-            self.gainLossPercentage = summary.gainLossPercentage
-        } catch {
-            self.error = "Failed to load portfolio: \(error.localizedDescription)"
-        }
-    }
-    
-    /// Refresh portfolio (for pull-to-refresh)
-    func refreshAssets() async {
-        isRefreshing = true
-        error = nil
-        defer { isRefreshing = false }
-        
-        do {
-            let summary = try await service.calculatePortfolioTotal()
-            self.assets = summary.assets
-            self.totalValue = summary.totalValue
-            self.gainLoss = summary.gainLoss
-            self.gainLossPercentage = summary.gainLossPercentage
-        } catch {
-            self.error = "Failed to refresh portfolio: \(error.localizedDescription)"
-        }
-    }
-    
-    /// Add a new asset to the portfolio
-    func addAsset(symbol: String, amount: Double) async {
-        guard !symbol.isEmpty, amount > 0 else {
-            error = "Please enter valid symbol and amount"
-            return
-        }
-        
-        isLoading = true
-        defer { isLoading = false }
-        
-        do {
-            // Fetch current price for the symbol
-            let price = try await service.fetchPrice(symbol: symbol)
+        loadTask = Task { @MainActor in
+            guard !Task.isCancelled else { return }
             
-            let newAsset = Asset(
-                symbol: symbol.uppercased(),
-                name: symbol.uppercased(),
-                amount: amount,
-                currentPrice: price
-            )
-            
-            try await service.addAsset(newAsset)
-            
-            // Refresh the portfolio
-            await loadAssets()
+            state = .loading
             error = nil
-        } catch {
-            self.error = "Failed to add asset: \(error.localizedDescription)"
+            
+            do {
+                let portfolioData = try await calculatePortfolioTotalUseCase.execute()
+                
+                guard !Task.isCancelled else { return }
+                
+                self.assets = portfolioData.assets
+                self.totalValue = portfolioData.totalValue
+                self.gainLoss = portfolioData.gainLoss
+                self.gainLossPercentage = portfolioData.gainLossPercentage
+                self.state = .loaded(portfolioData)
+                self.error = nil
+            } catch let domainError as DomainError {
+                guard !Task.isCancelled else { return }
+                self.state = .error(domainError)
+                self.error = domainError
+            } catch {
+                guard !Task.isCancelled else { return }
+                let wrappedError = DomainError.unknown(error.localizedDescription)
+                self.state = .error(wrappedError)
+                self.error = wrappedError
+            }
         }
+        
+        await loadTask?.value
+    }
+    
+    /// Refresh portfolio with cancellation support
+    func refreshAssets() async {
+        // Cancel any existing refresh task
+        refreshTask?.cancel()
+        
+        refreshTask = Task { @MainActor in
+            guard !Task.isCancelled else { return }
+            
+            // Keep previous data visible during refresh
+            let previousState = state
+            state = .loading
+            error = nil
+            
+            do {
+                let portfolioData = try await calculatePortfolioTotalUseCase.execute()
+                
+                guard !Task.isCancelled else { return }
+                
+                self.assets = portfolioData.assets
+                self.totalValue = portfolioData.totalValue
+                self.gainLoss = portfolioData.gainLoss
+                self.gainLossPercentage = portfolioData.gainLossPercentage
+                self.state = .loaded(portfolioData)
+                self.error = nil
+            } catch let domainError as DomainError {
+                guard !Task.isCancelled else { 
+                    // Restore previous state on cancel
+                    self.state = previousState
+                    return 
+                }
+                self.state = .error(domainError)
+                self.error = domainError
+            } catch {
+                guard !Task.isCancelled else { 
+                    self.state = previousState
+                    return 
+                }
+                let wrappedError = DomainError.unknown(error.localizedDescription)
+                self.state = .error(wrappedError)
+                self.error = wrappedError
+            }
+        }
+        
+        await refreshTask?.value
     }
     
     /// Delete an asset from the portfolio
     func deleteAsset(_ asset: Asset) async {
-        isLoading = true
-        defer { isLoading = false }
+        error = nil
         
         do {
-            try await service.deleteAsset(id: asset.id)
+            try await deleteAssetUseCase.execute(id: asset.id)
             
             // Update local state
             assets.removeAll { $0.id == asset.id }
             
-            // Recalculate totals
-            totalValue = assets.reduce(0) { $0 + $1.totalValue }
-            gainLoss = assets.reduce(0) { acc, asset in
-                acc + (asset.totalValue - (asset.amount * asset.currentPrice))
-            }
-            gainLossPercentage = totalValue > 0 ? (gainLoss / totalValue) * 100 : 0
+            // Recalculate totals using business logic
+            recalculateTotals()
             
-            error = nil
+            // Update state with new data
+            let portfolioData = PortfolioData(
+                assets: assets,
+                totalValue: totalValue,
+                gainLoss: gainLoss,
+                gainLossPercentage: gainLossPercentage
+            )
+            state = assets.isEmpty ? .idle : .loaded(portfolioData)
+            
+        } catch let domainError as DomainError {
+            self.error = domainError
         } catch {
-            self.error = "Failed to delete asset: \(error.localizedDescription)"
+            self.error = DomainError.unknown(error.localizedDescription)
         }
     }
     
-    /// Update an asset's amount
-    func updateAsset(_ asset: Asset, newAmount: Double) async {
-        guard newAmount > 0 else {
-            error = "Amount must be greater than 0"
-            return
-        }
-        
-        isLoading = true
-        defer { isLoading = false }
-        
-        do {
-            let updatedAsset = Asset(
-                id: asset.id,
-                symbol: asset.symbol,
-                name: asset.name,
-                amount: newAmount,
-                currentPrice: asset.currentPrice
-            )
-            
-            try await service.updateAsset(updatedAsset)
-            
-            // Update local state
-            if let index = assets.firstIndex(where: { $0.id == asset.id }) {
-                assets[index] = updatedAsset
-                
-                // Recalculate totals
-                totalValue = assets.reduce(0) { $0 + $1.totalValue }
-                gainLoss = assets.reduce(0) { acc, asset in
-                    acc + (asset.totalValue - (asset.amount * asset.currentPrice))
-                }
-                gainLossPercentage = totalValue > 0 ? (gainLoss / totalValue) * 100 : 0
-            }
-            
-            error = nil
-        } catch {
-            self.error = "Failed to update asset: \(error.localizedDescription)"
+    /// Clear error state
+    func clearError() {
+        error = nil
+        if case .error = state {
+            state = .idle
         }
     }
     
@@ -180,5 +196,16 @@ class PortfolioViewModel: ObservableObject {
     
     var formattedGainLossPercentage: String {
         String(format: "%@%.2f%%", isPositiveGainLoss ? "+" : "", abs(gainLossPercentage))
+    }
+    
+    // MARK: - Private Methods
+    
+    /// Recalculate totals from current assets
+    private func recalculateTotals() {
+        totalValue = assets.reduce(0) { $0 + $1.totalValue }
+        // For now, we calculate gain/loss as 0 since we don't track purchase price
+        // This would need historical data to be accurate
+        gainLoss = 0
+        gainLossPercentage = 0
     }
 }

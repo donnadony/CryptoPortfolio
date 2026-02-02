@@ -2,12 +2,13 @@
 //  Asset.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
 
-struct Asset: Codable, Identifiable, Equatable, Hashable {
+/// Domain entity representing a cryptocurrency asset in the portfolio
+struct Asset: Codable, Identifiable, Equatable, Hashable, Sendable {
     let id: String
     let symbol: String
     let name: String
@@ -31,6 +32,7 @@ struct Asset: Codable, Identifiable, Equatable, Hashable {
     }
     
     // MARK: - Codable
+    
     enum CodingKeys: String, CodingKey {
         case id
         case symbol
@@ -59,23 +61,21 @@ struct Asset: Codable, Identifiable, Equatable, Hashable {
     }
 }
 
-// MARK: - API Response Models
+// MARK: - Portfolio Summary
 
-struct AssetAPIResponse: Codable {
-    let id: String
-    let symbol: String
-    let name: String
-    let currentPrice: Double?
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case symbol
-        case name
-        case currentPrice = "current_price"
-    }
+/// Summary of portfolio assets with calculated totals
+struct PortfolioAssetsSummary: Equatable, Sendable {
+    let assets: [Asset]
+    let totalValue: Double
+    let totalInvested: Double
+    let gainLoss: Double
+    let gainLossPercentage: Double
 }
 
-struct MarketDataResponse: Codable {
+// MARK: - Market Data Response (Domain Model)
+
+/// Domain model for market data response
+struct MarketDataResponse: Equatable, Sendable {
     let id: String
     let symbol: String
     let name: String
@@ -83,42 +83,4 @@ struct MarketDataResponse: Codable {
     let marketCap: Double?
     let marketCapRank: Int?
     let priceChangePercentage24h: Double?
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case symbol
-        case name
-        case currentPrice = "current_price"
-        case marketCap = "market_cap"
-        case marketCapRank = "market_cap_rank"
-        case priceChangePercentage24h = "price_change_percentage_24h"
-    }
-}
-
-struct PriceResponse: Codable {
-    let prices: [[Double]]
-    let marketCaps: [[Double]]?
-    let volumes: [[Double]]?
-    
-    enum CodingKeys: String, CodingKey {
-        case prices
-        case marketCaps = "market_caps"
-        case volumes
-    }
-}
-
-struct PortfolioAssetsSummary: Codable {
-    let assets: [Asset]
-    let totalValue: Double
-    let totalInvested: Double
-    let gainLoss: Double
-    let gainLossPercentage: Double
-    
-    enum CodingKeys: String, CodingKey {
-        case assets
-        case totalValue = "total_value"
-        case totalInvested = "total_invested"
-        case gainLoss = "gain_loss"
-        case gainLossPercentage = "gain_loss_percentage"
-    }
 }

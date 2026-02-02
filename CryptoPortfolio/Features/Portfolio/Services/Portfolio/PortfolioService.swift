@@ -2,36 +2,50 @@
 //  PortfolioService.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
 
+/// Legacy PortfolioService - use PortfolioServiceImpl through DI Container instead
 final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
     // MARK: - Properties
     
     private let apiService: APIServiceProtocol
-    private let userDefaults: UserDefaults
+    private let localStorage: LocalStorageProtocol
     
     private let portfolioKey = "crypto_portfolio_assets"
-    private let coingeckoBaseURL = "https://api.coingecko.com/api/v3"
+    
+    // MARK: - Symbol to ID Mapping
+    
+    private let idMapping: [String: String] = [
+        "btc": "bitcoin",
+        "eth": "ethereum",
+        "xrp": "ripple",
+        "sol": "solana",
+        "ada": "cardano",
+        "dot": "polkadot",
+        "doge": "dogecoin",
+        "bnb": "binancecoin",
+        "usdt": "tether",
+        "usdc": "usd-coin"
+    ]
     
     // MARK: - Initialization
     
     init(
-        apiService: APIServiceProtocol = APIService.shared,
-        userDefaults: UserDefaults = .standard
+        apiService: APIServiceProtocol,
+        localStorage: LocalStorageProtocol
     ) {
         self.apiService = apiService
-        self.userDefaults = userDefaults
+        self.localStorage = localStorage
     }
     
     // MARK: - PortfolioServiceProtocol Implementation
     
     func fetchAssets() async throws -> [Asset] {
         // Try to load from local storage first
-        if let data = userDefaults.data(forKey: portfolioKey),
-           let assets = try? JSONDecoder().decode([Asset].self, from: data) {
+        if let assets = try? await localStorage.fetch(forKey: portfolioKey, as: [Asset].self) {
             return assets
         }
         return []
@@ -47,16 +61,13 @@ final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
         assets.append(asset)
         
         // Save to local storage
-        let encoded = try JSONEncoder().encode(assets)
-        userDefaults.set(encoded, forKey: portfolioKey)
+        try await localStorage.save(assets, forKey: portfolioKey)
     }
     
     func deleteAsset(id: String) async throws {
         var assets = try await fetchAssets()
         assets.removeAll { $0.id == id }
-        
-        let encoded = try JSONEncoder().encode(assets)
-        userDefaults.set(encoded, forKey: portfolioKey)
+        try await localStorage.save(assets, forKey: portfolioKey)
     }
     
     func updateAsset(_ asset: Asset) async throws {
@@ -64,29 +75,13 @@ final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
         
         if let index = assets.firstIndex(where: { $0.id == asset.id }) {
             assets[index] = asset
-            
-            let encoded = try JSONEncoder().encode(assets)
-            userDefaults.set(encoded, forKey: portfolioKey)
+            try await localStorage.save(assets, forKey: portfolioKey)
         } else {
             throw NetworkError.notFound
         }
     }
     
     func fetchPrice(symbol: String) async throws -> Double {
-        // Map common symbols to CoinGecko IDs
-        let idMapping: [String: String] = [
-            "btc": "bitcoin",
-            "eth": "ethereum",
-            "xrp": "ripple",
-            "sol": "solana",
-            "ada": "cardano",
-            "dot": "polkadot",
-            "doge": "dogecoin",
-            "bnb": "binancecoin",
-            "usdt": "tether",
-            "usdc": "usd-coin"
-        ]
-        
         let query = idMapping[symbol.lowercased()] ?? symbol.lowercased()
         let endpoint = "/simple/price"
         
@@ -136,7 +131,7 @@ final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
             URLQueryItem(name: "sparkline", value: "false")
         ]
         
-        let response: [MarketDataResponse] = try await apiService.request(
+        let response: [MarketDataResponseDTO] = try await apiService.request(
             endpoint: endpoint,
             method: .get,
             body: nil,
@@ -147,7 +142,7 @@ final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
             throw NetworkError.notFound
         }
         
-        return marketData
+        return MarketDataMapper.map(dto: marketData)
     }
     
     func fetchPriceHistory(
@@ -163,20 +158,14 @@ final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
             URLQueryItem(name: "interval", value: "daily")
         ]
         
-        let response: PriceResponse = try await apiService.request(
+        let response: PriceHistoryResponseDTO = try await apiService.request(
             endpoint: endpoint,
             method: .get,
             body: nil,
             queryItems: queryItems
         )
         
-        let priceHistory = response.prices.map { priceData -> (timestamp: Date, price: Double) in
-            let timestamp = Date(timeIntervalSince1970: priceData[0] / 1000)
-            let price = priceData[1]
-            return (timestamp, price)
-        }
-        
-        return priceHistory
+        return response.toDomain()
     }
     
     func calculatePortfolioTotal() async throws -> PortfolioAssetsSummary {
@@ -192,16 +181,11 @@ final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
             )
         }
         
-        // Update asset prices with current market data
         var updatedAssets: [Asset] = []
         
         for asset in assets {
             do {
                 let price = try await fetchPrice(symbol: asset.symbol)
-                var updatedAsset = asset
-                
-                // We need to update the asset with new price
-                // Since we can't directly modify totalValue, we create a new Asset
                 let newAsset = Asset(
                     id: asset.id,
                     symbol: asset.symbol,
@@ -210,11 +194,8 @@ final class PortfolioService: PortfolioServiceProtocol, @unchecked Sendable {
                     currentPrice: price
                 )
                 updatedAssets.append(newAsset)
-                
-                // Save updated asset
                 try await updateAsset(newAsset)
             } catch {
-                // If price fetch fails, keep the old asset
                 updatedAssets.append(asset)
             }
         }

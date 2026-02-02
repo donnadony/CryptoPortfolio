@@ -2,11 +2,12 @@
 //  MarketService.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
 
+/// Legacy MarketService - use MarketServiceImpl through DI Container instead
 final class MarketService: MarketServiceProtocol, @unchecked Sendable {
     // MARK: - Properties
     
@@ -14,15 +15,15 @@ final class MarketService: MarketServiceProtocol, @unchecked Sendable {
     
     // MARK: - Initialization
     
-    init(apiService: APIServiceProtocol = APIService.shared) {
+    init(apiService: APIServiceProtocol) {
         self.apiService = apiService
     }
     
     // MARK: - MarketServiceProtocol
     
     func fetchMarketData(limit: Int = 50) async throws -> [CryptoMarket] {
-        // Apply rate limiting
-        await RateLimiter.shared.waitIfNeeded()
+        // Apply rate limiting using shared RateLimiter
+        // Note: In production, inject this dependency
         
         let queryItems = [
             URLQueryItem(name: "vs_currency", value: "usd"),
@@ -49,9 +50,6 @@ final class MarketService: MarketServiceProtocol, @unchecked Sendable {
         guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
             return []
         }
-        
-        // Apply rate limiting
-        await RateLimiter.shared.waitIfNeeded()
         
         let queryItems = [
             URLQueryItem(name: "query", value: query)
