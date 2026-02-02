@@ -1,0 +1,131 @@
+/*
+  Localizable.strings (Español)
+  CryptoPortfolio
+  
+  Created by Donnadony Mollo on 02/01/2026.
+*/
+
+// MARK: - Tab Bar
+
+"Tab.Portfolio" = "Portafolio";
+"Tab.Market" = "Mercado";
+"Tab.Analytics" = "Análisis";
+"Tab.Watchlist" = "Favoritos";
+"Tab.Settings" = "Ajustes";
+
+// MARK: - Portfolio Screen
+
+"Portfolio.Title" = "Portafolio";
+"Portfolio.Empty.Title" = "Sin Activos Aún";
+"Portfolio.Empty.Message" = "Agrega tu primera criptomoneda para comenzar a rastrear tu portafolio";
+"Portfolio.AddAsset" = "Agregar Activo";
+"Portfolio.TotalValue" = "Valor Total";
+"Portfolio.Loading" = "Cargando Portafolio...";
+"Portfolio.Error.Title" = "No se pudo cargar el Portafolio";
+"Portfolio.TryAgain" = "Intentar de Nuevo";
+"Portfolio.Delete.Title" = "¿Eliminar Activo?";
+"Portfolio.Delete.Message" = "¿Estás seguro de que deseas eliminar %@ de tu portafolio?";
+
+// MARK: - Market Screen
+
+"Market.Title" = "Mercado";
+"Market.SearchPrompt" = "Buscar criptomonedas";
+"Market.Loading" = "Cargando datos del mercado...";
+"Market.Empty.Title" = "No hay datos de mercado disponibles";
+
+// MARK: - Analytics Screen
+
+"Analytics.Title" = "Análisis";
+"Analytics.Performance" = "Rendimiento";
+"Analytics.TotalReturn" = "Retorno Total";
+"Analytics.24hChange" = "Cambio 24h";
+"Analytics.AssetAllocation" = "Distribución de Activos";
+"Analytics.NoAssets" = "No hay activos para mostrar";
+"Analytics.TopPerformers" = "Mejores Rendimientos (24h)";
+"Analytics.NoData" = "No hay datos disponibles";
+"Analytics.QuickActions" = "Acciones Rápidas";
+"Analytics.Export" = "Exportar";
+"Analytics.Compare" = "Comparar";
+"Analytics.Alerts" = "Alertas";
+
+// Analytics Timeframes
+"Analytics.Timeframe.Day" = "24H";
+"Analytics.Timeframe.Week" = "7D";
+"Analytics.Timeframe.Month" = "30D";
+"Analytics.Timeframe.Year" = "1A";
+"Analytics.Timeframe.All" = "TODO";
+"Analytics.Timeframe.Last24Hours" = "Últimas 24 Horas";
+"Analytics.Timeframe.Last7Days" = "Últimos 7 Días";
+"Analytics.Timeframe.Last30Days" = "Últimos 30 Días";
+"Analytics.Timeframe.LastYear" = "Último Año";
+"Analytics.Timeframe.AllTime" = "Todo el Tiempo";
+
+// MARK: - Watchlist Screen
+
+"Watchlist.Title" = "Favoritos";
+"Watchlist.Empty.Title" = "Sin Favoritos Aún";
+"Watchlist.Empty.Message" = "Agrega criptomonedas a tu lista de favoritos para rastrearlas fácilmente";
+"Watchlist.BrowseMarket" = "Explorar Mercado";
+
+// MARK: - Settings Screen
+
+"Settings.Title" = "Ajustes";
+"Settings.Appearance" = "Apariencia";
+"Settings.Theme" = "Tema";
+"Settings.Language" = "Idioma";
+"Settings.Currency" = "Moneda";
+"Settings.Notifications" = "Notificaciones";
+"Settings.EnableNotifications" = "Activar Notificaciones";
+"Settings.About" = "Acerca de";
+"Settings.Version" = "Versión";
+"Settings.ResetDefaults" = "Restablecer Valores";
+
+// Theme Options
+"Settings.Theme.Light" = "Claro";
+"Settings.Theme.Dark" = "Oscuro";
+"Settings.Theme.System" = "Sistema";
+
+// Language Options
+"Settings.Language.English" = "Inglés";
+"Settings.Language.Spanish" = "Español";
+"Settings.Language.System" = "Predeterminado del Sistema";
+
+// MARK: - Add Asset Screen
+
+"AddAsset.Title" = "Agregar Activo";
+"AddAsset.Cryptocurrency" = "Criptomoneda";
+"AddAsset.SymbolPlaceholder" = "ej. BTC";
+"AddAsset.FetchPrice" = "Obtener Precio";
+"AddAsset.Amount" = "Cantidad";
+"AddAsset.CurrentPrice" = "Precio Actual";
+"AddAsset.TotalValue" = "Valor Total";
+"AddAsset.AddToPortfolio" = "Agregar al Portafolio";
+
+// MARK: - Asset Detail Screen
+
+"AssetDetail.MarketData" = "Datos del Mercado";
+"AssetDetail.24hChange" = "Cambio 24h";
+"AssetDetail.MarketCapRank" = "Ranking Cap. de Mercado";
+"AssetDetail.Statistics" = "Estadísticas";
+"AssetDetail.High30d" = "Máximo (30d)";
+"AssetDetail.Low30d" = "Mínimo (30d)";
+"AssetDetail.Average30d" = "Promedio (30d)";
+"AssetDetail.MarketCap" = "Cap. de Mercado";
+"AssetDetail.PriceHistory" = "Historial de Precios (30 Días)";
+"AssetDetail.NoData.Title" = "Sin Datos";
+"AssetDetail.NoData.Message" = "El historial de precios no está disponible";
+"AssetDetail.RemoveFromPortfolio" = "Quitar del Portafolio";
+"AssetDetail.Delete.Title" = "¿Eliminar Activo?";
+"AssetDetail.Delete.Message" = "¿Estás seguro de que deseas eliminar %@ de tu portafolio?";
+
+// MARK: - Common
+
+"Common.OK" = "Aceptar";
+"Common.Cancel" = "Cancelar";
+"Common.Delete" = "Eliminar";
+"Common.Error" = "Error";
+"Common.Loading" = "Cargando...";
+"Common.Retry" = "Reintentar";
+"Common.Done" = "Listo";
+"Common.Save" = "Guardar";
+"Common.Close" = "Cerrar";
