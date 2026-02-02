@@ -1,0 +1,8 @@
+# Screenshot files - generated during CI/CD
+*.png
+*.jpg
+*.jpeg
+
+# Keep the directory structure and READMEs
+!README.md
+!.gitkeep

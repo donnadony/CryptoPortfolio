@@ -1,0 +1,11 @@
+# The bundle identifier of your app
+app_identifier("com.dm.CryptoPortfolio")
+
+# Your Apple Developer Portal username (optional)
+# apple_id("your-email@example.com")
+
+# Your Apple Developer Team ID
+team_id("Z6L3HFTW23")
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

@@ -19,14 +19,14 @@ struct AppTheme {
         static let secondary = Color.brandSecondary
         static let accent = Color.brandAccent
         
-        // System Backgrounds
-        static let background = Color(.systemBackground)
-        static let secondaryBackground = Color(.secondarySystemBackground)
-        static let tertiaryBackground = Color(.tertiarySystemBackground)
+        // System Backgrounds (SwiftUI native)
+        static let background = Color(red: 0.98, green: 0.98, blue: 0.98)
+        static let secondaryBackground = Color(red: 0.95, green: 0.95, blue: 0.95)
+        static let tertiaryBackground = Color(red: 0.93, green: 0.93, blue: 0.93)
         
         // Grouped Backgrounds
-        static let groupedBackground = Color(.systemGroupedBackground)
-        static let groupedSecondary = Color(.secondarySystemGroupedBackground)
+        static let groupedBackground = Color(red: 0.97, green: 0.97, blue: 1.0)
+        static let groupedSecondary = Color.white
         
         // Adaptive Mesh Backgrounds
         static let meshBackground1 = Color.adaptiveBackground1

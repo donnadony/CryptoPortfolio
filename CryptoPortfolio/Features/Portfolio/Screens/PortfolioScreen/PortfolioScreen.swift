@@ -2,19 +2,26 @@
 //  PortfolioScreen.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import SwiftUI
 
+#if os(iOS)
 struct PortfolioScreen: View {
-    @Environment(\.colorScheme) var colorScheme
-    // MARK: - Properties
+    @Environment(\.container) private var container
+    @StateObject private var viewModel: PortfolioViewModel
+    @State private var showAddAsset = false
+    @State private var assetToDelete: Asset?
+    @State private var showDeleteConfirmation = false
     
-    @StateObject private var viewModel = PortfolioViewModel()
-    @State private var showAddSheet = false
+    /// Tracks if we need to refresh after sheet dismissal
+    @State private var needsRefreshOnAppear = false
     
-    // MARK: - Body
+    init() {
+        // Use DI container to create ViewModel
+        _viewModel = StateObject(wrappedValue: Container.shared.makePortfolioViewModel())
+    }
     
     var body: some View {
         NavigationStack {
@@ -22,27 +29,35 @@ struct PortfolioScreen: View {
                 AdaptiveMeshBackground()
                 
                 Group {
-                    if viewModel.isLoading && viewModel.assets.isEmpty {
+                    switch viewModel.state {
+                    case .loading where viewModel.assets.isEmpty:
                         loadingView
-                    } else if let error = viewModel.error, viewModel.assets.isEmpty {
+                    case .error(let error) where viewModel.assets.isEmpty:
                         errorView(error)
-                    } else if viewModel.hasAssets {
-                        assetsListView
-                    } else {
-                        emptyStateView
+                    default:
+                        if viewModel.assets.isEmpty {
+                            emptyStateView
+                        } else {
+                            portfolioView
+                        }
                     }
                 }
             }
-            .navigationTitle("Portfolio")
+            .navigationTitle(LocalizedKey.Portfolio.title.localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    addAssetButton
+                    Button(action: { showAddAsset = true }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundStyle(AppTheme.Colors.primary)
+                    }
                 }
             }
-            .sheet(isPresented: $showAddSheet, onDismiss: {
+            .sheet(isPresented: $showAddAsset, onDismiss: {
+                // Refresh portfolio when sheet is dismissed
                 Task {
-                    await viewModel.loadAssets()
+                    await viewModel.refreshAssets()
                 }
             }) {
                 AddAssetScreen()
@@ -53,64 +68,79 @@ struct PortfolioScreen: View {
             .refreshable {
                 await viewModel.refreshAssets()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .portfolioDidChange)) { _ in
+                // Listen for portfolio change notifications from anywhere in the app
+                Task {
+                    await viewModel.refreshAssets()
+                }
+            }
+            .alert(LocalizedKey.Common.error.localized, isPresented: .constant(viewModel.error != nil)) {
+                Button(LocalizedKey.Common.ok.localized) {
+                    viewModel.clearError()
+                }
+            } message: {
+                if let error = viewModel.error {
+                    Text(error.localizedDescription)
+                }
+            }
+            .confirmationDialog(
+                LocalizedKey.Portfolio.deleteTitle.localized,
+                isPresented: $showDeleteConfirmation,
+                presenting: assetToDelete
+            ) { asset in
+                Button(LocalizedKey.Common.delete.localized, role: .destructive) {
+                    Task {
+                        await viewModel.deleteAsset(asset)
+                    }
+                }
+                Button(LocalizedKey.Common.cancel.localized, role: .cancel) {}
+            } message: { asset in
+                Text(LocalizedKey.Portfolio.deleteMessage.localized(with: asset.name))
+            }
         }
     }
     
-    // MARK: - Subviews
+    // MARK: - Loading View
     
     private var loadingView: some View {
         VStack(spacing: AppTheme.Spacing.lg) {
             ProgressView()
                 .scaleEffect(1.5)
-                .tint(AppTheme.Colors.primary)
-            
-            Text("Loading portfolio...")
-                .font(AppTheme.Typography.callout)
+            Text(LocalizedKey.Portfolio.loading.localized)
+                .font(AppTheme.Typography.subheadline)
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    private func errorView(_ error: String) -> some View {
+    // MARK: - Error View
+    
+    private func errorView(_ error: DomainError) -> some View {
         VStack(spacing: AppTheme.Spacing.lg) {
-            VStack(spacing: AppTheme.Spacing.lg) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.system(size: 56))
-                    .foregroundStyle(AppTheme.Colors.warning)
-                    .symbolRenderingMode(.hierarchical)
-                
-                Text("Error")
-                    .font(AppTheme.Typography.title2)
-                    .foregroundStyle(.primary)
-                
-                Text(error)
-                    .font(AppTheme.Typography.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                
-                Button(action: {
-                    Task { await viewModel.loadAssets() }
-                }) {
-                    HStack(spacing: AppTheme.Spacing.sm) {
-                        Image(systemName: "arrow.clockwise")
-                        Text("Try Again")
-                    }
-                    .font(AppTheme.Typography.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppTheme.Spacing.md)
-                    .background(
-                        Capsule()
-                            .fill(AppTheme.Colors.warning)
-                    )
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 48))
+                .foregroundStyle(AppTheme.Colors.warning)
+            
+            Text(LocalizedKey.Portfolio.errorTitle.localized)
+                .font(AppTheme.Typography.title3)
+            
+            Text(error.localizedDescription)
+                .font(AppTheme.Typography.body)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            
+            Button(LocalizedKey.Portfolio.tryAgain.localized) {
+                Task {
+                    await viewModel.loadAssets()
                 }
             }
-            .padding(AppTheme.Spacing.xl)
-            .liquidGlassCard()
-            .padding(.horizontal, AppTheme.Spacing.lg)
+            .buttonStyle(.borderedProminent)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+    
+    // MARK: - Views
     
     private var emptyStateView: some View {
         VStack(spacing: AppTheme.Spacing.xl) {
@@ -118,25 +148,24 @@ struct PortfolioScreen: View {
             
             Image(systemName: "chart.pie.fill")
                 .font(.system(size: 72))
-                .foregroundStyle(AppTheme.Colors.secondary)
-                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(AppTheme.Colors.secondary.opacity(0.5))
             
             VStack(spacing: AppTheme.Spacing.md) {
-                Text("No Assets Yet")
+                Text(LocalizedKey.Portfolio.emptyTitle.localized)
                     .font(AppTheme.Typography.title2)
                     .foregroundStyle(.primary)
                 
-                Text("Start tracking your crypto portfolio by adding your first asset")
+                Text(LocalizedKey.Portfolio.emptyMessage.localized)
                     .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, AppTheme.Spacing.lg)
             }
             
-            Button(action: { showAddSheet = true }) {
+            Button(action: { showAddAsset = true }) {
                 HStack(spacing: AppTheme.Spacing.sm) {
-                    Image(systemName: "plus.circle.fill")
-                    Text("Add First Asset")
+                    Image(systemName: "plus")
+                    Text(LocalizedKey.Portfolio.addAsset.localized)
                 }
                 .font(AppTheme.Typography.headline)
                 .foregroundColor(.white)
@@ -154,34 +183,26 @@ struct PortfolioScreen: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    private var assetsListView: some View {
+    private var portfolioView: some View {
         ScrollView {
-            LazyVStack(spacing: AppTheme.Spacing.md, pinnedViews: [.sectionHeaders]) {
-                // Portfolio Summary Card
-                portfolioSummaryCard
+            LazyVStack(spacing: AppTheme.Spacing.md) {
+                // Total Value Card
+                totalValueCard
                 
-                // Section Header
-                HStack {
-                    Text("Your Assets")
-                        .font(AppTheme.Typography.headline)
-                        .foregroundStyle(.primary)
-                    
-                    Spacer()
-                    
-                    Text("\(viewModel.assets.count)")
-                        .font(AppTheme.Typography.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .glassPill()
-                }
-                .padding(.horizontal, AppTheme.Spacing.sm)
-                .padding(.top, AppTheme.Spacing.sm)
-                
-                // Asset Cards
+                // Assets List
                 ForEach(viewModel.assets) { asset in
                     NavigationLink(value: Route.assetDetail(asset)) {
-                        LiquidAssetRow(asset: asset)
+                        AssetRow(asset: asset)
                     }
                     .buttonStyle(.plain)
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            assetToDelete = asset
+                            showDeleteConfirmation = true
+                        } label: {
+                            Label(LocalizedKey.Common.delete.localized, systemImage: "trash")
+                        }
+                    }
                 }
             }
             .padding(.horizontal, AppTheme.Spacing.md)
@@ -189,125 +210,34 @@ struct PortfolioScreen: View {
         }
     }
     
-    private var portfolioSummaryCard: some View {
-        VStack(spacing: AppTheme.Spacing.lg) {
-            // Total Value
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                HStack {
-                    Text("Total Balance")
-                        .font(AppTheme.Typography.callout)
-                        .foregroundStyle(.secondary)
-                    
-                    Spacer()
-                    
-                    HStack(spacing: AppTheme.Spacing.xs) {
-                        Circle()
-                            .fill(AppTheme.Colors.success)
-                            .frame(width: 6, height: 6)
-                        Text("LIVE")
-                            .font(AppTheme.Typography.caption2.weight(.bold))
-                            .foregroundStyle(AppTheme.Colors.success)
-                    }
-                    .glassPill()
-                }
-                
-                Text(viewModel.formattedTotalValue)
-                    .font(AppTheme.Typography.monoTitle)
-                    .foregroundStyle(.primary)
-            }
+    private var totalValueCard: some View {
+        VStack(spacing: AppTheme.Spacing.md) {
+            Text(LocalizedKey.Portfolio.totalValue.localized)
+                .font(AppTheme.Typography.subheadline)
+                .foregroundStyle(.secondary)
             
-            Divider()
-                .background(.ultraThinMaterial)
+            Text(viewModel.formattedTotalValue)
+                .font(.system(size: 40, weight: .bold, design: .rounded))
+                .foregroundStyle(.primary)
             
-            // Stats Row
-            HStack(spacing: AppTheme.Spacing.lg) {
-                // 24h Change
-                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                    Text("24h Change")
-                        .font(AppTheme.Typography.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    HStack(spacing: AppTheme.Spacing.xs) {
-                        Image(systemName: viewModel.isPositiveGainLoss ? "arrow.up" : "arrow.down")
-                            .font(.caption2.weight(.bold))
-                        
-                        Text(viewModel.formattedGainLoss)
-                            .font(AppTheme.Typography.subheadline.weight(.semibold))
-                    }
+            HStack(spacing: AppTheme.Spacing.sm) {
+                Image(systemName: viewModel.isPositiveGainLoss ? "arrow.up.right" : "arrow.down.right")
                     .foregroundStyle(viewModel.isPositiveGainLoss ? AppTheme.Colors.success : AppTheme.Colors.error)
-                    .padding(.horizontal, AppTheme.Spacing.sm)
-                    .padding(.vertical, 4)
-                    .background(
-                        Capsule()
-                            .fill((viewModel.isPositiveGainLoss ? AppTheme.Colors.success : AppTheme.Colors.error).opacity(0.15))
-                    )
-                }
                 
-                Spacer()
-                
-                // Change %
-                VStack(alignment: .trailing, spacing: AppTheme.Spacing.xs) {
-                    Text("Change %")
-                        .font(AppTheme.Typography.caption)
-                        .foregroundStyle(.secondary)
-                    
-                    Text(viewModel.formattedGainLossPercentage)
-                        .font(AppTheme.Typography.subheadline.weight(.semibold))
-                        .foregroundStyle(viewModel.isPositiveGainLoss ? AppTheme.Colors.success : AppTheme.Colors.error)
-                }
-            }
-            
-            // Action Buttons
-            HStack(spacing: AppTheme.Spacing.md) {
-                Button(action: { showAddSheet = true }) {
-                    HStack(spacing: AppTheme.Spacing.xs) {
-                        Image(systemName: "plus")
-                        Text("Add")
-                    }
-                    .font(AppTheme.Typography.subheadline.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppTheme.Spacing.sm)
-                    .background(
-                        Capsule()
-                            .fill(Material.ultraThinMaterial)
-                    )
-                }
-                
-                Button(action: {
-                    Task { await viewModel.refreshAssets() }
-                }) {
-                    HStack(spacing: AppTheme.Spacing.xs) {
-                        Image(systemName: "arrow.clockwise")
-                        Text("Refresh")
-                    }
-                    .font(AppTheme.Typography.subheadline.weight(.semibold))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, AppTheme.Spacing.sm)
-                    .background(
-                        Capsule()
-                            .fill(AppTheme.Colors.secondary)
-                    )
-                }
+                Text("\(viewModel.formattedGainLoss) (\(viewModel.formattedGainLossPercentage))")
+                    .font(AppTheme.Typography.subheadline)
+                    .foregroundStyle(viewModel.isPositiveGainLoss ? AppTheme.Colors.success : AppTheme.Colors.error)
             }
         }
         .padding(AppTheme.Spacing.lg)
+        .frame(maxWidth: .infinity)
         .liquidGlassCard()
-    }
-    
-    private var addAssetButton: some View {
-        Button(action: { showAddSheet = true }) {
-            Image(systemName: "plus.circle.fill")
-                .font(.system(size: 24))
-                .foregroundStyle(AppTheme.Colors.primary)
-        }
     }
 }
 
-// MARK: - Liquid Asset Row
+// MARK: - Asset Row
 
-private struct LiquidAssetRow: View {
+struct AssetRow: View {
     let asset: Asset
     
     var body: some View {
@@ -315,40 +245,34 @@ private struct LiquidAssetRow: View {
             // Icon
             ZStack {
                 Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [AppTheme.Colors.primary, AppTheme.Colors.primary.opacity(0.7)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(AppTheme.Colors.primary.opacity(0.15))
                     .frame(width: 48, height: 48)
                 
                 Text(String(asset.symbol.prefix(1)))
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(.white)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundStyle(AppTheme.Colors.primary)
             }
             
-            // Asset Info
+            // Info
             VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
-                Text(asset.symbol)
+                Text(asset.name)
                     .font(AppTheme.Typography.headline)
                     .foregroundStyle(.primary)
                 
-                Text("\(asset.formattedAmount) \(asset.symbol)")
+                Text("\(asset.formattedAmount) \(asset.symbol.uppercased())")
                     .font(AppTheme.Typography.caption)
                     .foregroundStyle(.secondary)
             }
             
             Spacer()
             
-            // Value Info
+            // Value
             VStack(alignment: .trailing, spacing: AppTheme.Spacing.xs) {
                 Text(asset.formattedValue)
                     .font(AppTheme.Typography.headline)
                     .foregroundStyle(.primary)
                 
-                Text("@ \(asset.formattedPrice)")
+                Text(asset.formattedPrice)
                     .font(AppTheme.Typography.caption)
                     .foregroundStyle(.secondary)
             }
@@ -362,4 +286,7 @@ private struct LiquidAssetRow: View {
 
 #Preview {
     PortfolioScreen()
+        .withContainer()
+        .environmentObject(LanguageManager.shared)
 }
+#endif

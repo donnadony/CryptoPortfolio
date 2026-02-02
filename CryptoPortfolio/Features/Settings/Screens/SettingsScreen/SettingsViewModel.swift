@@ -2,55 +2,95 @@
 //  SettingsViewModel.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
 import Combine
 
-/// ViewModel for the Settings screen
-/// Manages user preferences and application settings
 @MainActor
-class SettingsViewModel: ObservableObject {
+final class SettingsViewModel: ObservableObject {
+    
     // MARK: - Published Properties
     
-    /// Current application settings
     @Published var settings: AppSettings = .default
     
-    /// Available currencies for selection
+    /// Unified view state
+    @Published var state: ViewState<AppSettings> = .idle
+    
+    /// Typed error
+    @Published var error: DomainError?
+    
     let availableCurrencies = AppSettings.availableCurrencies
-    
-    /// Available themes for selection
     let availableThemes = AppSettings.availableThemes
-    
-    /// Theme display names mapping
     let themeNames = AppSettings.themeNames
     
-    // MARK: - Private Properties
+    /// Loading state
+    var isLoading: Bool { state.isLoading }
     
-    private let service: SettingsServiceProtocol
+    // MARK: - Dependencies (UseCases)
+    
+    private let loadSettingsUseCase: any LoadSettingsUseCaseProtocol
+    private let saveSettingsUseCase: any SaveSettingsUseCaseProtocol
+    
+    // MARK: - Task Management
+    
+    private var loadTask: Task<Void, Never>?
+    private var saveTask: Task<Void, Never>?
     
     // MARK: - Initialization
     
-    init(service: SettingsServiceProtocol = SettingsService()) {
-        self.service = service
-        self.settings = service.loadSettings()
+    init(
+        loadSettingsUseCase: any LoadSettingsUseCaseProtocol,
+        saveSettingsUseCase: any SaveSettingsUseCaseProtocol
+    ) {
+        self.loadSettingsUseCase = loadSettingsUseCase
+        self.saveSettingsUseCase = saveSettingsUseCase
     }
     
     // MARK: - Public Methods
     
+    /// Load settings with cancellation support
+    func loadSettings() async {
+        loadTask?.cancel()
+        
+        loadTask = Task { @MainActor in
+            state = .loading
+            error = nil
+            
+            do {
+                let loadedSettings = try await loadSettingsUseCase.execute()
+                
+                guard !Task.isCancelled else { return }
+                
+                self.settings = loadedSettings
+                self.state = .loaded(loadedSettings)
+                self.error = nil
+            } catch let domainError as DomainError {
+                guard !Task.isCancelled else { return }
+                self.state = .error(domainError)
+                self.error = domainError
+            } catch {
+                guard !Task.isCancelled else { return }
+                let wrappedError = DomainError.unknown(error.localizedDescription)
+                self.state = .error(wrappedError)
+                self.error = wrappedError
+            }
+        }
+        
+        await loadTask?.value
+    }
+    
     /// Update currency preference
-    /// - Parameter currency: Selected currency code (USD, EUR, GBP, JPY, BTC)
-    func updateCurrency(_ currency: String) {
+    func updateCurrency(_ currency: String) async {
         settings.currency = currency
-        service.saveSettings(settings)
+        await saveSettings()
     }
     
     /// Update theme preference
-    /// - Parameter theme: Selected theme (light, dark, system)
-    func updateTheme(_ theme: String) {
+    func updateTheme(_ theme: String) async {
         settings.theme = theme
-        service.saveSettings(settings)
+        await saveSettings()
         
         // Apply theme globally
         if let themeEnum = ThemeManager.Theme(rawValue: theme) {
@@ -59,23 +99,42 @@ class SettingsViewModel: ObservableObject {
     }
     
     /// Toggle notifications setting
-    func toggleNotifications() {
+    func toggleNotifications() async {
         settings.notificationsEnabled.toggle()
-        service.saveSettings(settings)
+        await saveSettings()
     }
     
     /// Reset all settings to defaults
-    func resetToDefaults() {
+    func resetToDefaults() async {
         settings = AppSettings.default
-        service.resetSettings()
-        
-        // Reset theme
+        await saveSettings()
         ThemeManager.shared.setTheme(.system)
     }
     
     /// Get current settings
-    /// - Returns: Current AppSettings
     func getCurrentSettings() -> AppSettings {
-        return service.getCurrentSettings()
+        settings
+    }
+    
+    /// Clear error state
+    func clearError() {
+        error = nil
+        if case .error = state {
+            state = .loaded(settings)
+        }
+    }
+    
+    // MARK: - Private Methods
+    
+    private func saveSettings() async {
+        do {
+            try await saveSettingsUseCase.execute(settings)
+            state = .loaded(settings)
+            error = nil
+        } catch let domainError as DomainError {
+            self.error = domainError
+        } catch {
+            self.error = DomainError.unknown(error.localizedDescription)
+        }
     }
 }

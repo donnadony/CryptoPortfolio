@@ -2,490 +2,258 @@
 //  AssetDetailScreen.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import SwiftUI
 
+#if os(iOS)
 struct AssetDetailScreen: View {
-    // MARK: - Properties
-    
-    @StateObject private var detailViewModel: AssetDetailViewModel
-    @Environment(\.dismiss) var dismiss
-    
+    @Environment(\.dismiss) private var dismiss
+    @StateObject private var viewModel: AssetDetailViewModel
     @State private var showDeleteConfirmation = false
-    @State private var showEditSheet = false
+    @State private var showError = false
+    
+    let asset: Asset
     
     init(asset: Asset) {
-        _detailViewModel = StateObject(wrappedValue: AssetDetailViewModel(asset: asset))
+        self.asset = asset
+        _viewModel = StateObject(wrappedValue: Container.shared.makeAssetDetailViewModel(asset: asset))
     }
-    
-    // MARK: - Body
     
     var body: some View {
-        ZStack {
-            if detailViewModel.isLoading {
-                loadingView
-            } else {
-                scrollableContent
+        ScrollView {
+            VStack(spacing: AppTheme.Spacing.lg) {
+                // Header
+                headerSection
+                
+                // Price Info
+                priceSection
+                
+                // Stats Grid
+                statsSection
+                
+                // Price History
+                priceHistorySection
+                
+                // Actions
+                actionsSection
             }
+            .padding(AppTheme.Spacing.lg)
         }
-        .navigationTitle(detailViewModel.asset.symbol)
-        .navigationBarTitleDisplayMode(.inline)
+        .background(AdaptiveMeshBackground())
+        .navigationTitle(viewModel.asset.symbol.uppercased())
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Menu {
-                    Button(action: { showEditSheet = true }) {
-                        Label("Edit Amount", systemImage: "pencil")
-                    }
-                    
-                    Divider()
-                    
-                    Button(role: .destructive, action: { showDeleteConfirmation = true }) {
-                        Label("Delete Asset", systemImage: "trash")
-                    }
+                Button {
+                    showDeleteConfirmation = true
                 } label: {
-                    Image(systemName: "ellipsis.circle")
+                    Image(systemName: "trash")
+                        .foregroundStyle(AppTheme.Colors.error)
                 }
             }
-        }
-        .sheet(isPresented: $showEditSheet) {
-            EditAssetSheet(
-                asset: detailViewModel.asset,
-                isPresented: $showEditSheet,
-                onSave: { newAmount in
-                    Task {
-                        await detailViewModel.updateAmount(newAmount)
-                    }
-                }
-            )
         }
         .confirmationDialog(
-            "Delete Asset",
+            LocalizedKey.AssetDetail.deleteTitle.localized,
             isPresented: $showDeleteConfirmation,
-            presenting: detailViewModel.asset
-        ) { asset in
-            Button("Delete", role: .destructive) {
+            titleVisibility: .visible
+        ) {
+            Button(LocalizedKey.Common.delete.localized, role: .destructive) {
                 Task {
-                    await detailViewModel.deleteAsset()
-                    if detailViewModel.error == nil {
-                        dismiss()
-                    }
+                    try? await viewModel.deleteAsset()
+                    dismiss()
                 }
             }
-        } message: { asset in
-            Text("Are you sure you want to delete \(asset.symbol)? This action cannot be undone.")
+            Button(LocalizedKey.Common.cancel.localized, role: .cancel) {}
+        } message: {
+            Text(LocalizedKey.AssetDetail.deleteMessage.localized(with: viewModel.asset.name))
         }
-        .refreshable {
-            await detailViewModel.refreshData()
+        .alert(LocalizedKey.Common.error.localized, isPresented: $showError) {
+            Button(LocalizedKey.Common.ok.localized) {
+                viewModel.clearError()
+            }
+        } message: {
+            if let error = viewModel.error {
+                Text(error.localizedDescription)
+            }
+        }
+        .onChange(of: viewModel.error) { _, newError in
+            showError = newError != nil
         }
         .task {
-            await detailViewModel.loadDetails()
+            await viewModel.loadDetails()
         }
     }
     
-    // MARK: - Subviews
+    // MARK: - Views
     
-    private var loadingView: some View {
-        VStack(spacing: 16) {
-            ProgressView()
-                .scaleEffect(1.5, anchor: .center)
-            Text("Loading details...")
-                .font(.callout)
-                .foregroundColor(.secondary)
+    private var headerSection: some View {
+        VStack(spacing: AppTheme.Spacing.md) {
+            Text(viewModel.asset.name)
+                .font(AppTheme.Typography.title)
+                .foregroundStyle(.primary)
+            
+            Text(viewModel.asset.formattedValue)
+                .font(.system(size: 48, weight: .bold, design: .rounded))
+                .foregroundStyle(.primary)
+            
+            Text("\(viewModel.asset.formattedAmount) \(viewModel.asset.symbol.uppercased())")
+                .font(AppTheme.Typography.subheadline)
+                .foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity)
+        .padding(AppTheme.Spacing.xl)
+        .liquidGlassCard()
     }
     
-    private var scrollableContent: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                // Header Card
-                assetHeaderCard
-                
-                // Error Alert
-                if let error = detailViewModel.error {
-                    errorCard(error)
-                }
-                
-                // Holdings Info
-                holdingsCard
-                
-                // Market Data
-                if let marketData = detailViewModel.marketData {
-                    marketDataCard(marketData)
-                }
-                
-                // Price Statistics
-                if !detailViewModel.priceHistory.isEmpty {
-                    priceStatisticsCard
-                }
-                
-                // Price Chart Placeholder
-                if !detailViewModel.priceHistory.isEmpty {
-                    priceChartCard
-                }
-                
-                Spacer(minLength: 20)
-            }
-            .padding(16)
-        }
-    }
-    
-    private var assetHeaderCard: some View {
-        VStack(spacing: 16) {
+    private var priceSection: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            Text(LocalizedKey.AssetDetail.marketData.localized)
+                .font(AppTheme.Typography.headline)
+                .foregroundStyle(.primary)
+            
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(detailViewModel.asset.symbol)
-                        .font(.title2)
-                        .fontWeight(.bold)
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
+                    Text(LocalizedKey.AssetDetail.change24h.localized)
+                        .font(AppTheme.Typography.caption)
+                        .foregroundStyle(.secondary)
                     
-                    Text(detailViewModel.asset.name)
-                        .font(.callout)
-                        .foregroundColor(.secondary)
+                    Text(viewModel.priceChange24h)
+                        .font(AppTheme.Typography.subheadline)
+                        .foregroundStyle(viewModel.isPricePositive24h ? AppTheme.Colors.success : AppTheme.Colors.error)
                 }
                 
                 Spacer()
                 
-                VStack(alignment: .center, spacing: 0) {
-                    Text(String(detailViewModel.asset.symbol.prefix(1)))
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(.white)
-                }
-                .frame(width: 50, height: 50)
-                .background(Color.brandPrimary)
-                .cornerRadius(10)
-            }
-            
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("Current Price")
-                        .font(.callout)
-                        .foregroundColor(.secondary)
+                VStack(alignment: .trailing, spacing: AppTheme.Spacing.xs) {
+                    Text(LocalizedKey.AssetDetail.marketCapRank.localized)
+                        .font(AppTheme.Typography.caption)
+                        .foregroundStyle(.secondary)
                     
-                    Spacer()
-                    
-                    Text(detailViewModel.asset.formattedPrice)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                }
-                
-                HStack {
-                    Text("Holdings")
-                        .font(.callout)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(detailViewModel.asset.formattedAmount)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                }
-                
-                HStack {
-                    Text("Total Value")
-                        .font(.callout)
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(detailViewModel.asset.formattedValue)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(Color.brandPrimary)
+                    Text(viewModel.marketCapRank)
+                        .font(AppTheme.Typography.subheadline)
+                        .foregroundStyle(.primary)
                 }
             }
         }
-        .padding(16)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
+        .padding(AppTheme.Spacing.lg)
+        .liquidGlassCard()
     }
     
-    private func errorCard(_ error: String) -> some View {
-        VStack(spacing: 12) {
-            HStack(spacing: 12) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundColor(.orange)
-                    .font(.system(size: 18))
-                
-                Text(error)
-                    .font(.callout)
-                    .foregroundColor(.orange)
-                
-                Spacer()
+    private var statsSection: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            Text(LocalizedKey.AssetDetail.statistics.localized)
+                .font(AppTheme.Typography.headline)
+                .foregroundStyle(.primary)
+            
+            LazyVGrid(columns: [
+                GridItem(.flexible()),
+                GridItem(.flexible())
+            ], spacing: AppTheme.Spacing.md) {
+                StatCard(title: LocalizedKey.AssetDetail.high30d.localized, value: viewModel.formattedHighPrice)
+                StatCard(title: LocalizedKey.AssetDetail.low30d.localized, value: viewModel.formattedLowPrice)
+                StatCard(title: LocalizedKey.AssetDetail.average30d.localized, value: viewModel.formattedAveragePrice)
+                StatCard(title: LocalizedKey.AssetDetail.marketCap.localized, value: viewModel.marketCap)
             }
         }
-        .padding(12)
-        .background(Color.orange.opacity(0.1))
-        .cornerRadius(8)
     }
     
-    private var holdingsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
+    private var priceHistorySection: some View {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+            Text(LocalizedKey.AssetDetail.priceHistory.localized)
+                .font(AppTheme.Typography.headline)
+                .foregroundStyle(.primary)
+            
+            if viewModel.priceHistory.isEmpty {
+                ContentUnavailableView {
+                    Label(LocalizedKey.AssetDetail.noDataTitle.localized, systemImage: "chart.line.uptrend.xyaxis")
+                } description: {
+                    Text(LocalizedKey.AssetDetail.noDataMessage.localized)
+                }
+                .frame(height: 200)
+            } else {
+                SimplePriceChart(data: viewModel.priceHistory)
+                    .frame(height: 200)
+            }
+        }
+        .padding(AppTheme.Spacing.lg)
+        .liquidGlassCard()
+    }
+    
+    private var actionsSection: some View {
+        Button(action: {
+            showDeleteConfirmation = true
+        }) {
             HStack {
-                Label("Holdings Summary", systemImage: "chart.pie.fill")
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                
-                Spacer()
-                
-                Button(action: { showEditSheet = true }) {
-                    Label("Edit", systemImage: "pencil.circle.fill")
-                        .font(.caption)
-                }
-                .buttonStyle(.bordered)
+                Image(systemName: "trash")
+                Text(LocalizedKey.AssetDetail.removeFromPortfolio.localized)
             }
-            
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("Amount")
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(detailViewModel.asset.formattedAmount)
-                        .fontWeight(.semibold)
-                }
-                
-                HStack {
-                    Text("Price per Unit")
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(detailViewModel.asset.formattedPrice)
-                        .fontWeight(.semibold)
-                }
-                
-                Divider()
-                
-                HStack {
-                    Text("Total Investment")
-                        .fontWeight(.semibold)
-                    
-                    Spacer()
-                    
-                    Text(detailViewModel.asset.formattedValue)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(Color.brandPrimary)
-                }
-            }
+            .font(AppTheme.Typography.headline)
+            .foregroundColor(AppTheme.Colors.error)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, AppTheme.Spacing.md)
+            .background(
+                RoundedRectangle(cornerRadius: AppTheme.CornerRadius.md)
+                    .stroke(AppTheme.Colors.error, lineWidth: 2)
+            )
         }
-        .padding(16)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
-    }
-    
-    private func marketDataCard(_ marketData: MarketDataResponse) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Market Data", systemImage: "chart.bar.fill")
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    Text("Market Cap Rank")
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(detailViewModel.marketCapRank)
-                        .fontWeight(.semibold)
-                }
-                
-                HStack {
-                    Text("Market Cap")
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    Text(detailViewModel.marketCap)
-                        .fontWeight(.semibold)
-                }
-                
-                HStack {
-                    Text("24h Change")
-                        .foregroundColor(.secondary)
-                    
-                    Spacer()
-                    
-                    HStack(spacing: 4) {
-                        Image(systemName: detailViewModel.isPricePositive24h ? "arrow.up.right" : "arrow.down.left")
-                            .font(.caption)
-                        
-                        Text(detailViewModel.priceChange24h)
-                    }
-                    .fontWeight(.semibold)
-                    .foregroundColor(detailViewModel.isPricePositive24h ? .green : .red)
-                }
-            }
-        }
-        .padding(16)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
-    }
-    
-    private var priceStatisticsCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("30-Day Statistics", systemImage: "chart.line.uptrend.xyaxis")
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("High")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Text(detailViewModel.formattedHighPrice)
-                            .font(.headline)
-                            .foregroundColor(.green)
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("Low")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Text(detailViewModel.formattedLowPrice)
-                            .font(.headline)
-                            .foregroundColor(.red)
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .trailing, spacing: 4) {
-                        Text("Average")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Text(detailViewModel.formattedAveragePrice)
-                            .font(.headline)
-                            .foregroundColor(.blue)
-                    }
-                }
-            }
-        }
-        .padding(16)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
-    }
-    
-    private var priceChartCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Price History (30 Days)", systemImage: "chart.line.xaxis")
-                .font(.headline)
-                .foregroundColor(.primary)
-            
-            // Simplified chart representation
-            VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: 0) {
-                    ForEach(0..<detailViewModel.priceHistory.count, id: \.self) { index in
-                        let price = detailViewModel.priceHistory[index].price
-                        let minPrice = detailViewModel.lowPrice ?? 0
-                        let maxPrice = detailViewModel.highPrice ?? 1
-                        let normalizedHeight = (price - minPrice) / (maxPrice - minPrice) * 100
-                        
-                        VStack(spacing: 0) {
-                            Spacer()
-                            
-                            RoundedRectangle(cornerRadius: 1)
-                                .fill(price >= (detailViewModel.averagePrice ?? 0) ? Color.green : Color.red)
-                                .frame(height: CGFloat(normalizedHeight))
-                        }
-                        .frame(height: 60)
-                    }
-                }
-                .padding(.vertical, 8)
-            }
-        }
-        .padding(16)
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
     }
 }
 
-// MARK: - Edit Asset Sheet
+// MARK: - Stat Card
 
-private struct EditAssetSheet: View {
-    let asset: Asset
-    @Binding var isPresented: Bool
-    let onSave: (Double) -> Void
-    
-    @State private var amount: String = ""
-    @State private var showError = false
-    @State private var errorMessage = ""
+struct StatCard: View {
+    let title: String
+    let value: String
     
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("Asset Details") {
-                    HStack {
-                        Text("Symbol")
-                        Spacer()
-                        Text(asset.symbol)
-                            .fontWeight(.semibold)
-                    }
-                    
-                    TextField("Amount", text: $amount)
-                        .keyboardType(.decimalPad)
-                }
-                
-                if showError {
-                    Section {
-                        HStack(spacing: 12) {
-                            Image(systemName: "exclamationmark.circle.fill")
-                                .foregroundColor(.red)
-                            
-                            Text(errorMessage)
-                                .font(.callout)
-                                .foregroundColor(.red)
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Edit Amount")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        isPresented = false
-                    }
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        if validateAndSave() {
-                            isPresented = false
-                        }
-                    }
-                    .disabled(amount.isEmpty)
-                }
-            }
-            .onAppear {
-                amount = String(format: "%.8f", asset.amount)
-            }
+        VStack(spacing: AppTheme.Spacing.xs) {
+            Text(title)
+                .font(AppTheme.Typography.caption)
+                .foregroundStyle(.secondary)
+            
+            Text(value)
+                .font(AppTheme.Typography.subheadline)
+                .foregroundStyle(.primary)
         }
+        .frame(maxWidth: .infinity)
+        .padding(AppTheme.Spacing.md)
+        .background(Color(.systemGray6))
+        .cornerRadius(AppTheme.CornerRadius.md)
     }
+}
+
+// MARK: - Simple Price Chart
+
+struct SimplePriceChart: View {
+    let data: [PriceHistoryPoint]
     
-    private func validateAndSave() -> Bool {
-        guard let newAmount = Double(amount), newAmount > 0 else {
-            errorMessage = "Amount must be greater than 0"
-            showError = true
-            return false
+    var body: some View {
+        GeometryReader { geometry in
+            if let minPrice = data.map({ $0.price }).min(),
+               let maxPrice = data.map({ $0.price }).max(),
+               maxPrice > minPrice {
+                
+                let width = geometry.size.width
+                let height = geometry.size.height
+                let priceRange = maxPrice - minPrice
+                
+                Path { path in
+                    for (index, point) in data.enumerated() {
+                        let x = CGFloat(index) / CGFloat(data.count - 1) * width
+                        let y = height - ((point.price - minPrice) / priceRange) * height
+                        
+                        if index == 0 {
+                            path.move(to: CGPoint(x: x, y: y))
+                        } else {
+                            path.addLine(to: CGPoint(x: x, y: y))
+                        }
+                    }
+                }
+                .stroke(AppTheme.Colors.primary, lineWidth: 2)
+            }
         }
-        
-        onSave(newAmount)
-        return true
     }
 }
 
@@ -502,4 +270,7 @@ private struct EditAssetSheet: View {
             )
         )
     }
+    .withContainer()
+    .environmentObject(LanguageManager.shared)
 }
+#endif

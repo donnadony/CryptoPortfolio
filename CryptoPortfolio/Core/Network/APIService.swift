@@ -2,7 +2,7 @@
 //  APIService.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
@@ -16,8 +16,9 @@ protocol APIServiceProtocol: Sendable {
     ) async throws -> T
 }
 
+/// API Service for making network requests
+/// Note: This is NOT a singleton. Use DI Container to get instances.
 final class APIService: APIServiceProtocol, @unchecked Sendable {
-    static let shared = APIService()
     
     private let session: URLSession
     
@@ -72,7 +73,6 @@ final class APIService: APIServiceProtocol, @unchecked Sendable {
         // 7. Decode Response
         do {
             let decoder = JSONDecoder()
-            // Note: Models have their own CodingKeys, so we don't use keyDecodingStrategy
             let result = try decoder.decode(T.self, from: data)
             print("🟢 [APIService] Decoding successful for \(T.self)")
             return result

@@ -1,0 +1,107 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  
+  # ============================================
+  # Screenshot Lanes
+  # ============================================
+  
+  desc "Generate screenshots in Light Mode"
+  lane :screenshots_light do
+    # Ensure we have the right simulator
+    snapshot(
+      scheme: "CryptoPortfolio",
+      devices: ["iPhone 15 Pro"],
+      languages: ["en-US", "es-ES"],
+      output_directory: "./fastlane/screenshots/light",
+      clear_previous_screenshots: true,
+      dark_mode: false,
+      skip_open_summary: true,
+      ios_version: "18.0",
+      reinstall_app: true,
+      xcargs: "-skipPackagePluginValidation SDKROOT=iphoneos",
+      test_without_building: false
+    )
+  end
+  
+  desc "Generate screenshots in Dark Mode"
+  lane :screenshots_dark do
+    snapshot(
+      scheme: "CryptoPortfolio",
+      devices: ["iPhone 15 Pro"],
+      languages: ["en-US", "es-ES"],
+      output_directory: "./fastlane/screenshots/dark",
+      clear_previous_screenshots: true,
+      dark_mode: true,
+      skip_open_summary: true,
+      ios_version: "18.0",
+      reinstall_app: true,
+      xcargs: "-skipPackagePluginValidation SDKROOT=iphoneos",
+      test_without_building: false
+    )
+  end
+  
+  desc "Generate all screenshots (Light + Dark Mode)"
+  lane :screenshots_all do
+    screenshots_light
+    screenshots_dark
+    
+    # Combine screenshots into single directory for App Store
+    puts "Screenshots generated successfully!"
+    puts "Light mode: ./fastlane/screenshots/light"
+    puts "Dark mode: ./fastlane/screenshots/dark"
+  end
+  
+  desc "Run UI Tests only (no screenshots)"
+  lane :ui_tests do
+    scan(
+      scheme: "CryptoPortfolio",
+      test_target_name: "CryptoPortfolioUITests",
+      sdk: "iphonesimulator",
+      clean: true,
+      xcargs: "-skipPackagePluginValidation"
+    )
+  end
+  
+  # ============================================
+  # Build Lanes
+  # ============================================
+  
+  desc "Build app for testing"
+  lane :build_for_testing do
+    gym(
+      scheme: "CryptoPortfolio",
+      configuration: "Debug",
+      sdk: "iphonesimulator",
+      skip_package_pkg: true,
+      skip_archive: true,
+      skip_codesigning: true,
+      build_path: "./build",
+      derived_data_path: "./DerivedData",
+      xcargs: "-skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO"
+    )
+  end
+  
+  desc "Clean build artifacts"
+  lane :clean do
+    clean_build_artifacts
+    clear_derived_data
+    puts "Build artifacts cleaned!"
+  end
+  
+end

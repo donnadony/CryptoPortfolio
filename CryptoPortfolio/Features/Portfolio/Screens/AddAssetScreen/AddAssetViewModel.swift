@@ -2,14 +2,15 @@
 //  AddAssetViewModel.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
 import Combine
 
 @MainActor
-class AddAssetViewModel: ObservableObject {
+final class AddAssetViewModel: ObservableObject {
+    
     // MARK: - Published Properties
     
     @Published var symbol: String = ""
@@ -19,47 +20,69 @@ class AddAssetViewModel: ObservableObject {
     
     @Published var isLoading = false
     @Published var isValidating = false
-    @Published var error: String?
-    
     @Published var symbolSuggestions: [String] = []
     @Published var showSuggestions = false
     
-    // MARK: - Dependencies
+    /// Typed error
+    @Published var error: DomainError?
     
-    private let service: PortfolioServiceProtocol
+    // MARK: - Dependencies (UseCases)
+    
+    private let addAssetUseCase: any AddAssetUseCaseProtocol
+    private let fetchPriceUseCase: any FetchPriceUseCaseProtocol
+    
+    // MARK: - Task Management
+    
+    private var priceFetchTask: Task<Void, Never>?
     
     // MARK: - Initialization
     
-    init(service: PortfolioServiceProtocol = PortfolioService()) {
-        self.service = service
+    init(
+        addAssetUseCase: any AddAssetUseCaseProtocol,
+        fetchPriceUseCase: any FetchPriceUseCaseProtocol
+    ) {
+        self.addAssetUseCase = addAssetUseCase
+        self.fetchPriceUseCase = fetchPriceUseCase
     }
     
     // MARK: - Public Methods
     
     /// Validate and save the asset
-    func saveAsset() async {
-        guard validateInput() else { return }
+    func saveAsset() async -> Bool {
+        guard validateInput() else { return false }
         
         isLoading = true
+        error = nil
         defer { isLoading = false }
         
         do {
-            guard let amount = Double(amount), amount > 0 else {
-                error = "Invalid amount"
-                return
+            guard let amountValue = Double(amount), amountValue > 0 else {
+                throw DomainError.invalidAmount
             }
             
             let asset = Asset(
                 symbol: symbol.uppercased(),
                 name: symbol.uppercased(),
-                amount: amount,
+                amount: amountValue,
                 currentPrice: currentPrice
             )
             
-            try await service.addAsset(asset)
+            try await addAssetUseCase.execute(asset)
             error = nil
+            
+            // Notify that portfolio changed
+            await NotificationCenter.postPortfolioChange(userInfo: [
+                "action": "add",
+                "symbol": asset.symbol
+            ])
+            
+            return true
+        } catch let domainError as DomainError {
+            self.error = domainError
+            return false
         } catch {
-            self.error = "Failed to save asset: \(error.localizedDescription)"
+            self.error = DomainError.unknown(error.localizedDescription)
+            return false
         }
     }
     
@@ -72,24 +95,57 @@ class AddAssetViewModel: ObservableObject {
         totalValue = amountValue * currentPrice
     }
     
-    /// Fetch current price for the entered symbol
+    /// Fetch current price for the entered symbol with cancellation
     func fetchPrice() async {
+        // Cancel any existing price fetch task
+        priceFetchTask?.cancel()
+        
         guard !symbol.isEmpty else {
-            error = "Please enter a symbol"
+            error = DomainError.invalidSymbol
             return
         }
         
-        isValidating = true
-        defer { isValidating = false }
-        
-        do {
-            currentPrice = try await service.fetchPrice(symbol: symbol)
+        priceFetchTask = Task { @MainActor in
+            isValidating = true
             error = nil
-            updateTotalValue()
-        } catch {
-            self.error = "Could not fetch price for \(symbol)"
-            currentPrice = 0
+            
+            do {
+                let price = try await fetchPriceUseCase.execute(symbol: symbol)
+                
+                guard !Task.isCancelled else { return }
+                
+                self.currentPrice = price
+                self.error = nil
+                self.updateTotalValue()
+            } catch let domainError as DomainError {
+                guard !Task.isCancelled else { return }
+                self.error = domainError
+                self.currentPrice = 0
+            } catch {
+                guard !Task.isCancelled else { return }
+                self.error = DomainError.unknown(error.localizedDescription)
+                self.currentPrice = 0
+            }
+            
+            self.isValidating = false
         }
+        
+        await priceFetchTask?.value
+    }
+    
+    /// Clear error state
+    func clearError() {
+        error = nil
+    }
+    
+    /// Reset form
+    func reset() {
+        symbol = ""
+        amount = ""
+        currentPrice = 0
+        totalValue = 0
+        isLoading = false
+        error = nil
     }
     
     // MARK: - Private Methods
@@ -98,27 +154,27 @@ class AddAssetViewModel: ObservableObject {
         error = nil
         
         guard !symbol.trimmingCharacters(in: .whitespaces).isEmpty else {
-            error = "Symbol is required"
+            error = DomainError.invalidSymbol
             return false
         }
         
         guard symbol.count >= 2 && symbol.count <= 10 else {
-            error = "Symbol must be between 2 and 10 characters"
+            error = DomainError.invalidSymbol
             return false
         }
         
         guard !amount.isEmpty else {
-            error = "Amount is required"
+            error = DomainError.invalidAmount
             return false
         }
         
         guard let amountValue = Double(amount), amountValue > 0 else {
-            error = "Amount must be greater than 0"
+            error = DomainError.invalidAmount
             return false
         }
         
         guard currentPrice > 0 else {
-            error = "Could not fetch price for this symbol"
+            error = DomainError.invalidAssetData
             return false
         }
         

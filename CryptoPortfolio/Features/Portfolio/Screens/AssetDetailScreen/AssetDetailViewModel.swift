@@ -2,64 +2,115 @@
 //  AssetDetailViewModel.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import Foundation
 import Combine
 
 @MainActor
-class AssetDetailViewModel: ObservableObject {
+final class AssetDetailViewModel: ObservableObject {
+    
     // MARK: - Published Properties
     
     @Published var asset: Asset
     @Published var marketData: MarketDataResponse?
-    @Published var priceHistory: [(timestamp: Date, price: Double)] = []
+    @Published var priceHistory: [PriceHistoryPoint] = []
     
-    @Published var isLoading = false
-    @Published var error: String?
+    /// Unified view state
+    @Published var state: AssetDetailViewState = .idle
+    
+    /// Typed error
+    @Published var error: DomainError?
     
     @Published var editAmount: String = ""
     @Published var showEditSheet = false
     
-    // MARK: - Dependencies
+    /// Loading state
+    var isLoading: Bool { state.isLoading }
     
-    private let service: PortfolioServiceProtocol
+    // MARK: - Dependencies (UseCases)
+    
+    private let updateAssetUseCase: any UpdateAssetUseCaseProtocol
+    private let deleteAssetUseCase: any DeleteAssetUseCaseProtocol
+    private let portfolioFetchMarketDataUseCase: any PortfolioFetchMarketDataUseCaseProtocol
+    private let fetchPriceHistoryUseCase: any FetchPriceHistoryUseCaseProtocol
+    
+    // MARK: - Task Management
+    
+    private var loadTask: Task<Void, Never>?
     
     // MARK: - Initialization
     
     init(
         asset: Asset,
-        service: PortfolioServiceProtocol = PortfolioService()
+        updateAssetUseCase: any UpdateAssetUseCaseProtocol,
+        deleteAssetUseCase: any DeleteAssetUseCaseProtocol,
+        portfolioFetchMarketDataUseCase: any PortfolioFetchMarketDataUseCaseProtocol,
+        fetchPriceHistoryUseCase: any FetchPriceHistoryUseCaseProtocol
     ) {
         self.asset = asset
-        self.service = service
+        self.updateAssetUseCase = updateAssetUseCase
+        self.deleteAssetUseCase = deleteAssetUseCase
+        self.portfolioFetchMarketDataUseCase = portfolioFetchMarketDataUseCase
+        self.fetchPriceHistoryUseCase = fetchPriceHistoryUseCase
         self.editAmount = String(format: "%.8f", asset.amount)
     }
     
     // MARK: - Public Methods
     
-    /// Load market data and price history
+    /// Load market data and price history with parallel execution
     func loadDetails() async {
-        isLoading = true
-        error = nil
-        defer { isLoading = false }
+        // Cancel existing load task
+        loadTask?.cancel()
         
-        async let marketDataTask = fetchMarketData()
-        async let priceHistoryTask = fetchPriceHistory()
+        loadTask = Task { @MainActor in
+            guard !Task.isCancelled else { return }
+            
+            state = .loading
+            error = nil
+            
+            do {
+                // Use async let for parallel execution
+                async let marketDataTask = fetchMarketData()
+                async let priceHistoryTask = fetchPriceHistory()
+                
+                let (marketDataResult, priceHistoryResult) = await (marketDataTask, priceHistoryTask)
+                
+                guard !Task.isCancelled else { return }
+                
+                self.marketData = marketDataResult
+                self.priceHistory = priceHistoryResult
+                
+                let detailData = AssetDetailData(
+                    asset: asset,
+                    marketData: marketDataResult,
+                    priceHistory: priceHistoryResult
+                )
+                
+                self.state = .loaded(detailData)
+                self.error = nil
+            } catch let domainError as DomainError {
+                guard !Task.isCancelled else { return }
+                self.state = .error(domainError)
+                self.error = domainError
+            } catch {
+                guard !Task.isCancelled else { return }
+                let wrappedError = DomainError.unknown(error.localizedDescription)
+                self.state = .error(wrappedError)
+                self.error = wrappedError
+            }
+        }
         
-        let (_, _) = await (marketDataTask, priceHistoryTask)
+        await loadTask?.value
     }
     
     /// Update the asset amount
     func updateAmount(_ newAmount: Double) async {
         guard newAmount > 0 else {
-            error = "Amount must be greater than 0"
+            error = DomainError.invalidAmount
             return
         }
-        
-        isLoading = true
-        defer { isLoading = false }
         
         do {
             let updatedAsset = Asset(
@@ -70,28 +121,30 @@ class AssetDetailViewModel: ObservableObject {
                 currentPrice: asset.currentPrice
             )
             
-            try await service.updateAsset(updatedAsset)
+            try await updateAssetUseCase.execute(updatedAsset)
             
             self.asset = updatedAsset
             self.editAmount = String(format: "%.8f", newAmount)
             self.error = nil
             self.showEditSheet = false
+            
+            // Update state
+            let detailData = AssetDetailData(
+                asset: updatedAsset,
+                marketData: marketData,
+                priceHistory: priceHistory
+            )
+            state = .loaded(detailData)
+        } catch let domainError as DomainError {
+            self.error = domainError
         } catch {
-            self.error = "Failed to update asset: \(error.localizedDescription)"
+            self.error = DomainError.unknown(error.localizedDescription)
         }
     }
     
     /// Delete the asset
-    func deleteAsset() async {
-        isLoading = true
-        defer { isLoading = false }
-        
-        do {
-            try await service.deleteAsset(id: asset.id)
-            error = nil
-        } catch {
-            self.error = "Failed to delete asset: \(error.localizedDescription)"
-        }
+    func deleteAsset() async throws {
+        try await deleteAssetUseCase.execute(id: asset.id)
     }
     
     /// Refresh market data
@@ -99,23 +152,33 @@ class AssetDetailViewModel: ObservableObject {
         await loadDetails()
     }
     
-    // MARK: - Private Methods
-    
-    private func fetchMarketData() async {
-        do {
-            let data = try await service.fetchMarketData(symbol: asset.symbol)
-            self.marketData = data
-        } catch {
-            self.error = "Failed to load market data: \(error.localizedDescription)"
+    /// Clear error state
+    func clearError() {
+        error = nil
+        if case .error = state {
+            state = .idle
         }
     }
     
-    private func fetchPriceHistory() async {
+    // MARK: - Private Methods
+    
+    private func fetchMarketData() async -> MarketDataResponse? {
         do {
-            let history = try await service.fetchPriceHistory(symbol: asset.symbol, days: 30)
-            self.priceHistory = history
+            return try await portfolioFetchMarketDataUseCase.execute(symbol: asset.symbol)
         } catch {
-            self.error = "Failed to load price history: \(error.localizedDescription)"
+            // Don't fail the whole operation if market data fails
+            print("⚠️ Failed to fetch market data: \(error)")
+            return nil
+        }
+    }
+    
+    private func fetchPriceHistory() async -> [PriceHistoryPoint] {
+        do {
+            return try await fetchPriceHistoryUseCase.execute(symbol: asset.symbol, days: 30)
+        } catch {
+            // Don't fail the whole operation if price history fails
+            print("⚠️ Failed to fetch price history: \(error)")
+            return []
         }
     }
     
@@ -126,7 +189,7 @@ class AssetDetailViewModel: ObservableObject {
               let cap = marketData.marketCap else {
             return "N/A"
         }
-        return String(format: "$%.2fB", cap)
+        return String(format: "$%.2fB", cap / 1_000_000_000)
     }
     
     var marketCapRank: String {

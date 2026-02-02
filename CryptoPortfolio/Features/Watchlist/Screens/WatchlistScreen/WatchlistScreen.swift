@@ -2,15 +2,21 @@
 //  WatchlistScreen.swift
 //  CryptoPortfolio
 //
-//  Created by Donnadony Mollo on 31/01/2026.
+//  Created by Donnadony Mollo on 02/01/2026.
 //
 
 import SwiftUI
 
+#if os(iOS)
 struct WatchlistScreen: View {
     @Environment(\.colorScheme) var colorScheme
-    @StateObject private var viewModel = WatchlistViewModel()
+    @StateObject private var viewModel: WatchlistViewModel
     @State private var showAddSheet = false
+    @State private var showError = false
+    
+    init() {
+        _viewModel = StateObject(wrappedValue: Container.shared.makeWatchlistViewModel())
+    }
     
     var body: some View {
         NavigationStack {
@@ -25,7 +31,7 @@ struct WatchlistScreen: View {
                     }
                 }
             }
-            .navigationTitle("Watchlist")
+            .navigationTitle(LocalizedKey.Watchlist.title.localized)
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -40,7 +46,19 @@ struct WatchlistScreen: View {
                 MarketScreen()
             }
             .task {
-                viewModel.loadItems()
+                await viewModel.loadItems()
+            }
+            .alert(LocalizedKey.Common.error.localized, isPresented: $showError) {
+                Button(LocalizedKey.Common.ok.localized) {
+                    viewModel.clearError()
+                }
+            } message: {
+                if let error = viewModel.error {
+                    Text(error.localizedDescription)
+                }
+            }
+            .onChange(of: viewModel.error) { _, newError in
+                showError = newError != nil
             }
         }
     }
@@ -54,11 +72,11 @@ struct WatchlistScreen: View {
                 .foregroundStyle(AppTheme.Colors.secondary.opacity(0.5))
             
             VStack(spacing: AppTheme.Spacing.md) {
-                Text("No Favorites Yet")
+                Text(LocalizedKey.Watchlist.emptyTitle.localized)
                     .font(AppTheme.Typography.title2)
                     .foregroundStyle(.primary)
                 
-                Text("Add cryptocurrencies to your watchlist to track them easily")
+                Text(LocalizedKey.Watchlist.emptyMessage.localized)
                     .font(AppTheme.Typography.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -68,7 +86,7 @@ struct WatchlistScreen: View {
             Button(action: { showAddSheet = true }) {
                 HStack(spacing: AppTheme.Spacing.sm) {
                     Image(systemName: "magnifyingglass")
-                    Text("Browse Market")
+                    Text(LocalizedKey.Watchlist.browseMarket.localized)
                 }
                 .font(AppTheme.Typography.headline)
                 .foregroundColor(.white)
@@ -92,7 +110,11 @@ struct WatchlistScreen: View {
                 ForEach(viewModel.items) { item in
                     WatchlistCard(
                         item: item,
-                        onDelete: { viewModel.removeItem(id: item.id) }
+                        onDelete: {
+                            Task {
+                                await viewModel.removeItem(id: item.id)
+                            }
+                        }
                     )
                 }
             }
@@ -160,4 +182,7 @@ struct WatchlistCard: View {
 
 #Preview {
     WatchlistScreen()
+        .withContainer()
+        .environmentObject(LanguageManager.shared)
 }
+#endif
