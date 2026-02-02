@@ -1,0 +1,72 @@
+fastlane documentation
+----
+
+# Installation
+
+Make sure you have the latest version of the Xcode command line tools installed:
+
+```sh
+xcode-select --install
+```
+
+For _fastlane_ installation instructions, see [Installing _fastlane_](https://docs.fastlane.tools/#installing-fastlane)
+
+# Available Actions
+
+## iOS
+
+### ios screenshots_light
+
+```sh
+[bundle exec] fastlane ios screenshots_light
+```
+
+Generate screenshots in Light Mode
+
+### ios screenshots_dark
+
+```sh
+[bundle exec] fastlane ios screenshots_dark
+```
+
+Generate screenshots in Dark Mode
+
+### ios screenshots_all
+
+```sh
+[bundle exec] fastlane ios screenshots_all
+```
+
+Generate all screenshots (Light + Dark Mode)
+
+### ios ui_tests
+
+```sh
+[bundle exec] fastlane ios ui_tests
+```
+
+Run UI Tests only (no screenshots)
+
+### ios build_for_testing
+
+```sh
+[bundle exec] fastlane ios build_for_testing
+```
+
+Build app for testing
+
+### ios clean
+
+```sh
+[bundle exec] fastlane ios clean
+```
+
+Clean build artifacts
+
+----
+
+This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.
+
+More information about _fastlane_ can be found on [fastlane.tools](https://fastlane.tools).
+
+The documentation of _fastlane_ can be found on [docs.fastlane.tools](https://docs.fastlane.tools).

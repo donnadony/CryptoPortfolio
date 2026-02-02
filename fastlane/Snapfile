@@ -1,0 +1,58 @@
+# A list of devices you want to take the screenshots from
+devices([
+  "iPhone 15 Pro"
+])
+
+# A list of supported languages
+languages([
+  "en-US",
+  "es-ES"
+])
+
+# The name of the scheme which contains the UI Tests
+scheme("CryptoPortfolio")
+
+# Where should the resulting screenshots be stored?
+output_directory("./fastlane/screenshots")
+
+# Clear all previously generated screenshots before creating new ones
+clear_previous_screenshots(true)
+
+# Remove the '#' to set the status bar to 9:41 AM, and show full battery and reception.
+# See: https://docs.fastlane.tools/actions/snapshot/#set-status-bar-to-a-specific-time
+override_status_bar(true)
+
+# Arguments to pass to the app on launch.
+# These arguments are passed directly to the app and can be used for mocking data
+launch_arguments([
+  "UI_TEST_MODE",
+  "MOCK_DATA_ENABLED"
+])
+
+# Use concurrent simulators for faster screenshot generation
+# Disable if you encounter issues
+concurrent_simulators(true)
+
+# Clean the build directory before running
+clean(true)
+
+# Erase the simulator before running the tests
+erase_simulator(false)
+
+# Reinstall the app before running the tests
+reinstall_app(true)
+
+# The test target to use for screenshots
+test_target_name("CryptoPortfolioUITests")
+
+# Skip the HTML summary generation after running snapshot
+skip_open_summary(true)
+
+# Build with testing options
+buildlog_path("./fastlane/build_logs")
+
+# Number of times to retry on failure
+number_of_retries(2)
+
+# Silence all xcodebuild output except for errors and warnings
+# silent(true)
