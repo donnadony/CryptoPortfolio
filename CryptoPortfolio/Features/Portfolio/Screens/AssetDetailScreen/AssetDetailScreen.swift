@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct AssetDetailScreen: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: AssetDetailViewModel
@@ -271,3 +272,4 @@ struct SimplePriceChart: View {
     }
     .withContainer()
 }
+#endif

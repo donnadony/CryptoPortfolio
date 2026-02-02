@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct PortfolioScreen: View {
     @Environment(\.container) private var container
     @StateObject private var viewModel: PortfolioViewModel
@@ -226,3 +227,4 @@ struct AssetRow: View {
     PortfolioScreen()
         .withContainer()
 }
+#endif

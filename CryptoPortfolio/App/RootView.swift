@@ -55,12 +55,27 @@ struct RootView: View {
     @ViewBuilder
     private func routeView(for route: Route) -> some View {
         switch route {
+        #if os(iOS)
         case .portfolio:
             PortfolioScreen()
+        #else
+        case .portfolio:
+            Text("Portfolio not available on this platform")
+        #endif
+        #if os(iOS)
         case .assetDetail(let asset):
             AssetDetailScreen(asset: asset)
+        #else
+        case .assetDetail:
+            Text("Asset detail not available on this platform")
+        #endif
+        #if os(iOS)
         case .addAsset:
             AddAssetScreen()
+        #else
+        case .addAsset:
+            Text("Add Asset not available on this platform")
+        #endif
         #if os(iOS)
         case .market:
             MarketScreen()

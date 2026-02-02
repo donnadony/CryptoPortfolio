@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct AddAssetScreen: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: AddAssetViewModel
@@ -189,3 +190,4 @@ struct AddAssetScreen: View {
     AddAssetScreen()
         .withContainer()
 }
+#endif

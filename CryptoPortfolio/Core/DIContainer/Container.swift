@@ -181,6 +181,16 @@ extension Container {
             saveSettingsUseCase: saveSettingsUseCase
         )
     }
+    
+    // MARK: - Generic Resolve
+    
+    /// Resolve any type from the container
+    func resolve<T>(_ type: T.Type) -> T {
+        if type is TransactionDataSource.Type {
+            return MockTransactionDataSource() as! T
+        }
+        fatalError("Cannot resolve type: \(T.self)")
+    }
 }
 
 // MARK: - Environment Key
