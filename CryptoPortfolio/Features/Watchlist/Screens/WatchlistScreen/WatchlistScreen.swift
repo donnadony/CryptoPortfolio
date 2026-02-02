@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct WatchlistScreen: View {
     @Environment(\.colorScheme) var colorScheme
     @StateObject private var viewModel: WatchlistViewModel
@@ -183,3 +184,4 @@ struct WatchlistCard: View {
     WatchlistScreen()
         .withContainer()
 }
+#endif

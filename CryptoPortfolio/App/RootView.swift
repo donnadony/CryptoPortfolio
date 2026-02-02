@@ -22,13 +22,16 @@ struct RootView: View {
                 Label("Portfolio", systemImage: "chart.pie.fill")
             }
             
+            #if os(iOS)
             NavigationStack {
                 MarketScreen()
             }
             .tabItem {
                 Label("Market", systemImage: "chart.bar.fill")
             }
+            #endif
             
+            #if os(iOS)
             NavigationStack {
                 WatchlistScreen()
             }
@@ -36,12 +39,15 @@ struct RootView: View {
                 Label("Watchlist", systemImage: "star.fill")
             }
             
+            #endif
+            #if os(iOS)
             NavigationStack {
                 SettingsScreen()
             }
             .tabItem {
                 Label("Settings", systemImage: "gearshape.fill")
             }
+            #endif
         }
         .environmentObject(router)
     }
@@ -55,10 +61,20 @@ struct RootView: View {
             AssetDetailScreen(asset: asset)
         case .addAsset:
             AddAssetScreen()
+        #if os(iOS)
         case .market:
             MarketScreen()
+        #else
+        case .market:
+            Text("Market not available on this platform")
+        #endif
+        #if os(iOS)
         case .settings:
             SettingsScreen()
+        #else
+        case .settings:
+            Text("Settings not available on this platform")
+        #endif
         }
     }
 }

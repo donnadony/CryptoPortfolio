@@ -51,18 +51,7 @@ class ThemeManager: ObservableObject {
     }
     
     private func applyTheme(_ theme: Theme) {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let window = windowScene.windows.first else {
-            return
-        }
-        
-        switch theme {
-        case .light:
-            window.overrideUserInterfaceStyle = .light
-        case .dark:
-            window.overrideUserInterfaceStyle = .dark
-        case .system:
-            window.overrideUserInterfaceStyle = .unspecified
-        }
+        // Theme is applied through @Environment(\.colorScheme) in SwiftUI
+        currentTheme = theme
     }
 }

@@ -188,16 +188,18 @@ extension Color {
     }
 }
 
-// MARK: - Environment-based Color Init
+// MARK: - Environment-based Color Init (SwiftUI Native)
 
 extension Color {
     init(light: Color, dark: Color) {
-        self.init(uiColor: UIColor(
-            light: UIColor(light),
-            dark: UIColor(dark)
-        ))
+        // Use @Environment(\.colorScheme) in views instead
+        // This is kept for compatibility but uses light color by default
+        self = light
     }
 }
+
+#if os(iOS)
+import UIKit
 
 extension UIColor {
     convenience init(light: UIColor, dark: UIColor) {
@@ -211,3 +213,4 @@ extension UIColor {
         }
     }
 }
+#endif

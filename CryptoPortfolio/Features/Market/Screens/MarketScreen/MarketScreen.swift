@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct MarketScreen: View {
     @StateObject private var viewModel: MarketViewModel
     @State private var showError = false
@@ -174,3 +175,4 @@ struct MarketRow: View {
     MarketScreen()
         .withContainer()
 }
+#endif

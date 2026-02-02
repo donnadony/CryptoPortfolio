@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if os(iOS)
 struct SettingsScreen: View {
     @StateObject private var viewModel: SettingsViewModel
     @State private var showError = false
@@ -113,3 +114,4 @@ struct SettingsScreen: View {
     SettingsScreen()
         .withContainer()
 }
+#endif
