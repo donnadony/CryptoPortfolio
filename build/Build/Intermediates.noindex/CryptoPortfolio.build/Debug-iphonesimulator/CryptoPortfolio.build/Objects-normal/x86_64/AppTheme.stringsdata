@@ -1,0 +1,56 @@
+{
+  "source": "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Theme/AppTheme.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Liquid Glass Card",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 250
+        }
+      },
+      {
+        "comment": "",
+        "key": "Glass Pill",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 250
+        }
+      },
+      {
+        "comment": "",
+        "key": "Primary Button",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 250
+        }
+      },
+      {
+        "comment": "",
+        "key": "Liquid Glass Card",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 268
+        }
+      },
+      {
+        "comment": "",
+        "key": "Glass Pill",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 268
+        }
+      },
+      {
+        "comment": "",
+        "key": "Primary Button",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 268
+        }
+      }
+    ]
+  },
+  "version": 1
+}

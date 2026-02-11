@@ -1,0 +1,58 @@
+{
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/App/RootView.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/RootView.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/RootView.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/RootView.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/RootView.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/RootView.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Core/DIContainer/Container.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Container.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Container.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Container.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Container.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Container.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Core/Network/APIConfig.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIConfig.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIConfig.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIConfig.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIConfig.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIConfig.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Core/Network/APIService.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIService.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIService.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIService.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIService.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/APIService.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Core/Network/HTTPMethod.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/HTTPMethod.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/HTTPMethod.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/HTTPMethod.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/HTTPMethod.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/HTTPMethod.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Core/Network/NetworkError.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/NetworkError.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/NetworkError.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/NetworkError.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/NetworkError.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/NetworkError.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Core/Storage/LocalStorageProtocol.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/LocalStorageProtocol.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/LocalStorageProtocol.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/LocalStorageProtocol.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/LocalStorageProtocol.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/LocalStorageProtocol.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Core/Storage/UserDefaultsLocalStorage.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/UserDefaultsLocalStorage.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/UserDefaultsLocalStorage.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/UserDefaultsLocalStorage.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/UserDefaultsLocalStorage.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/UserDefaultsLocalStorage.swiftdeps"
+  }
+}

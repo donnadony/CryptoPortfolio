@@ -1,0 +1,49 @@
+{
+  "" : {
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests-primary.dia",
+    "emit-module-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests-primary-emit-module.dia",
+    "pch" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests-primary.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolioUITests/CryptoPortfolioUITests.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests.dia",
+    "index-unit-output-path" : "/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests.o",
+    "llvm-bc" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests.bc",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests.swiftdeps",
+    "swiftmodule" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITests~partial.swiftmodule"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolioUITests/CryptoPortfolioUITestsLaunchTests.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITestsLaunchTests.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITestsLaunchTests.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITestsLaunchTests.dia",
+    "index-unit-output-path" : "/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITestsLaunchTests.o",
+    "llvm-bc" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITestsLaunchTests.bc",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITestsLaunchTests.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITestsLaunchTests.swiftdeps",
+    "swiftmodule" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/CryptoPortfolioUITestsLaunchTests~partial.swiftmodule"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolioUITests/Helpers/SnapshotHelper.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/SnapshotHelper.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/SnapshotHelper.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/SnapshotHelper.dia",
+    "index-unit-output-path" : "/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/SnapshotHelper.o",
+    "llvm-bc" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/SnapshotHelper.bc",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/SnapshotHelper.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/SnapshotHelper.swiftdeps",
+    "swiftmodule" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/SnapshotHelper~partial.swiftmodule"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolioUITests/ScreenshotCaptureTests.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/ScreenshotCaptureTests.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/ScreenshotCaptureTests.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/ScreenshotCaptureTests.dia",
+    "index-unit-output-path" : "/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/ScreenshotCaptureTests.o",
+    "llvm-bc" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/ScreenshotCaptureTests.bc",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/ScreenshotCaptureTests.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/ScreenshotCaptureTests.swiftdeps",
+    "swiftmodule" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolioUITests.build/Objects-normal/arm64/ScreenshotCaptureTests~partial.swiftmodule"
+  }
+}

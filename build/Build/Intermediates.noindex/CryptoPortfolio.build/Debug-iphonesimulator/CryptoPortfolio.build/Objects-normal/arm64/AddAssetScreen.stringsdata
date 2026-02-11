@@ -1,0 +1,16 @@
+{
+  "source": "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Features/Portfolio/Screens/AddAssetScreen/AddAssetScreen.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "0.00",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 108
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -1,0 +1,70 @@
+{
+  "buildCommand" : {
+    "command" : "build",
+    "skipDependencies" : false,
+    "style" : "buildOnly"
+  },
+  "configuredTargets" : [
+    {
+      "guid" : "30ae222ea41f5d1fe8eb6e2b58ccff90ac61aee2e5fe5c51fa8b1a7bd258a4ce"
+    },
+    {
+      "guid" : "30ae222ea41f5d1fe8eb6e2b58ccff901806f6a58fa017353ad6224622cbc2e6"
+    },
+    {
+      "guid" : "30ae222ea41f5d1fe8eb6e2b58ccff908d196aaad4bd1d67a688c9fd6a9186b7"
+    }
+  ],
+  "containerPath" : "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio.xcodeproj",
+  "continueBuildingAfterErrors" : false,
+  "dependencyScope" : "workspace",
+  "enableIndexBuildArena" : false,
+  "hideShellScriptEnvironment" : false,
+  "parameters" : {
+    "action" : "build",
+    "activeArchitecture" : "undefined_arch",
+    "activeRunDestination" : {
+      "disableOnlyActiveArch" : true,
+      "platform" : "iphonesimulator",
+      "sdk" : "iphonesimulator26.2",
+      "sdkVariant" : "iphonesimulator",
+      "supportedArchitectures" : [
+        "i386",
+        "x86_64"
+      ],
+      "targetArchitecture" : "undefined_arch"
+    },
+    "arenaInfo" : {
+      "buildIntermediatesPath" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex",
+      "buildProductsPath" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Products",
+      "derivedDataPath" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build",
+      "indexDataStoreFolderPath" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Index.noindex/DataStore",
+      "indexEnableDataStore" : true,
+      "indexPCHPath" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Index.noindex/PrecompiledHeaders",
+      "pchPath" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/PrecompiledHeaders"
+    },
+    "configurationName" : "Debug",
+    "overrides" : {
+      "commandLine" : {
+        "table" : {
+          "SDKROOT" : "iphonesimulator26.2"
+        }
+      },
+      "synthesized" : {
+        "table" : {
+          "CLANG_COVERAGE_MAPPING" : "YES",
+          "CLANG_PROFILE_DATA_DIRECTORY" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/ProfileData",
+          "ENABLE_PREVIEWS" : "NO",
+          "ENABLE_XOJIT_PREVIEWS" : "YES",
+          "ONLY_ACTIVE_ARCH" : "YES"
+        }
+      }
+    }
+  },
+  "schemeCommand" : "test",
+  "showNonLoggedProgress" : true,
+  "useDryRun" : false,
+  "useImplicitDependencies" : true,
+  "useLegacyBuildLocations" : false,
+  "useParallelTargets" : true
+}

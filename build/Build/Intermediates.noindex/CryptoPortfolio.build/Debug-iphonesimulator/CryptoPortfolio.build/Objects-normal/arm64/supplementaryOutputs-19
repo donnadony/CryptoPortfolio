@@ -1,0 +1,51 @@
+{
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Features/Watchlist/Screens/WatchlistScreen/WatchlistScreen.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistScreen.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistScreen.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistScreen.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistScreen.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistScreen.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Features/Watchlist/Screens/WatchlistScreen/WatchlistViewModel.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistViewModel.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistViewModel.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistViewModel.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistViewModel.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistViewModel.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Features/Watchlist/Services/WatchlistService.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistService.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistService.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistService.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistService.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistService.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Features/Watchlist/Services/WatchlistServiceImpl.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceImpl.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceImpl.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceImpl.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceImpl.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceImpl.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Features/Watchlist/Services/WatchlistServiceProtocol.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceProtocol.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceProtocol.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceProtocol.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceProtocol.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/WatchlistServiceProtocol.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Navigation/Route.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Route.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Route.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Route.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Route.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Route.swiftdeps"
+  },
+  "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Navigation/Router.swift" : {
+    "const-values" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Router.swiftconstvalues",
+    "dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Router.d",
+    "diagnostics" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Router.dia",
+    "object" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Router.o",
+    "swift-dependencies" : "/Users/donnadony/Documents/personal/CryptoPortfolio/build/Build/Intermediates.noindex/CryptoPortfolio.build/Debug-iphonesimulator/CryptoPortfolio.build/Objects-normal/arm64/Router.swiftdeps"
+  }
+}

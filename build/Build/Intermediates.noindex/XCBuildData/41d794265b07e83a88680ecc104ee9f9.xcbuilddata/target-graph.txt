@@ -1,0 +1,6 @@
+Target dependency graph (3 targets)
+Target 'CryptoPortfolioTests' in project 'CryptoPortfolio'
+➜ Explicit dependency on target 'CryptoPortfolio' in project 'CryptoPortfolio'
+Target 'CryptoPortfolioUITests' in project 'CryptoPortfolio'
+➜ Explicit dependency on target 'CryptoPortfolio' in project 'CryptoPortfolio'
+Target 'CryptoPortfolio' in project 'CryptoPortfolio' (no dependencies)

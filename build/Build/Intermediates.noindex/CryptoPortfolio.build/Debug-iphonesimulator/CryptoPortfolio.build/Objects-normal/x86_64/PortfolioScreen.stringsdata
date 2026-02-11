@@ -1,0 +1,24 @@
+{
+  "source": "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Features/Portfolio/Screens/PortfolioScreen/PortfolioScreen.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%@ (%@)",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 227
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %@",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 262
+        }
+      }
+    ]
+  },
+  "version": 1
+}

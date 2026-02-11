@@ -1,0 +1,16 @@
+{
+  "source": "/Users/donnadony/Documents/personal/CryptoPortfolio/CryptoPortfolio/Features/Market/Screens/MarketScreen/MarketScreen.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%lld",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 117
+        }
+      }
+    ]
+  },
+  "version": 1
+}

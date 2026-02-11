@@ -82,13 +82,13 @@ open class Snapshot: NSObject {
         #if os(visionOS)
         let screenshot = XCUIScreen.main.screenshot()
         #elseif os(iOS)
-        let screenshot = app.windows.firstMatch.screenshot()
+        let screenshot = app?.windows.firstMatch.screenshot()
         #elseif os(tvOS)
-        let screenshot = app.windows.firstMatch.screenshot()
+        let screenshot = app?.windows.firstMatch.screenshot()
         #elseif os(macOS)
-        let screenshot = app.windows.firstMatch.screenshot()
+        let screenshot = app?.windows.firstMatch.screenshot()
         #elseif os(watchOS)
-        let screenshot = app.screenshot()
+        let screenshot = app?.screenshot()
         #endif
 
         guard let screenshotsDirectory = screenshotsDirectory else {
@@ -108,11 +108,11 @@ open class Snapshot: NSObject {
 
         do {
             let path = screenshotsDirectory.appendingPathComponent("\(language)-\(locale)-\(name).png")
-            #if os(watchOS)
+            guard let screenshot = screenshot else {
+                print("Couldn't capture screenshot")
+                return
+            }
             try screenshot.pngRepresentation.write(to: path)
-            #else
-            try screenshot.pngRepresentation.write(to: path)
-            #endif
         } catch let error {
             print("Problem writing screenshot: \(name) to \(screenshotsDirectory)/\(language)-\(locale)-\(name).png")
             print(error)
@@ -124,7 +124,7 @@ open class Snapshot: NSObject {
             return
         #endif
 
-        let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusIndicators.networkLoadingIndicator
+        let networkLoadingIndicator = XCUIApplication().otherElements.deviceStatusIndicators.networkLoadingIndicators.firstMatch
         let networkLoadingIndicatorDisappeared = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: networkLoadingIndicator)
         _ = XCTWaiter.wait(for: [networkLoadingIndicatorDisappeared], timeout: timeout)
     }
@@ -188,9 +188,7 @@ private extension XCUIElementQuery {
     }
 
     var deviceStatusIndicators: XCUIElementQuery {
-        guard let deviceWidth = XCUIApplication().windows.firstMatch.frame.width else {
-            return self
-        }
+        let deviceWidth = XCUIApplication().windows.firstMatch.frame.width
 
         let isStatusBar = NSPredicate { (evaluatedObject, _) in
             guard let element = evaluatedObject as? XCUIElementAttributes else { return false }

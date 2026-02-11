@@ -237,7 +237,10 @@ final class CryptoPortfolioUITests: XCTestCase {
         sleep(2)
         
         // Look for add button
-        let addButton = app.buttons["Add"] || app.navigationBars.buttons["+"]
+        var addButton = app.buttons["Add"]
+        if !addButton.exists {
+            addButton = app.navigationBars.buttons["+"]
+        }
         if addButton.exists {
             addButton.tap()
             sleep(1)
