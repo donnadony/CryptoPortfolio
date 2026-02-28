@@ -205,12 +205,12 @@ extension Container {
     
     // MARK: - Generic Resolve
     
-    /// Resolve any type from the container
-    func resolve<T>(_ type: T.Type) -> T {
+    /// Resolve any type from the container, returns nil if unregistered
+    func resolve<T>(_ type: T.Type) -> T? {
         if type is TransactionDataSource.Type {
-            return MockTransactionDataSource() as! T
+            return MockTransactionDataSource() as? T
         }
-        fatalError("Cannot resolve type: \(T.self)")
+        return nil
     }
 }
 

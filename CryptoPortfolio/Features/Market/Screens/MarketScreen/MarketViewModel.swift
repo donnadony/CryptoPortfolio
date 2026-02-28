@@ -35,7 +35,7 @@ final class MarketViewModel: ObservableObject {
     
     /// Loading states derived from state
     var isLoading: Bool { state.isLoading }
-    var isSearching = false
+    @Published var isSearching = false
     var isSearchDisabled: Bool { isRateLimited || isLoading }
     var canRetry: Bool { !isRateLimited && !isLoading }
     var hasResults: Bool { !filteredCryptocurrencies.isEmpty }
@@ -215,7 +215,6 @@ final class MarketViewModel: ObservableObject {
     func loadCryptoDetail(id: String) async {
         guard !isRateLimited else { return }
         
-        isLoading ? () : ()
         error = nil
         
         do {

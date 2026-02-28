@@ -35,6 +35,8 @@ struct AssetStorageDTO: Codable {
     let name: String
     let amount: Double
     let currentPrice: Double
+    /// Price at the time of purchase — persisted for gain/loss tracking
+    let purchasePrice: Double
     let savedAt: Date
     
     // MARK: - CodingKeys (support both snake_case and camelCase)
@@ -46,6 +48,7 @@ struct AssetStorageDTO: Codable {
         case amount
         case currentPrice = "current_price"
         case currentPriceCamel = "currentPrice"
+        case purchasePrice = "purchase_price"
         case savedAt = "saved_at"
         case savedAtCamel = "savedAt"
         case totalValue = "total_value"  // Old format field (ignored but accepted)
@@ -53,12 +56,13 @@ struct AssetStorageDTO: Codable {
     
     // MARK: - Initialization
     
-    init(id: String, symbol: String, name: String, amount: Double, currentPrice: Double, savedAt: Date = Date()) {
+    init(id: String, symbol: String, name: String, amount: Double, currentPrice: Double, purchasePrice: Double? = nil, savedAt: Date = Date()) {
         self.id = id
         self.symbol = symbol
         self.name = name
         self.amount = amount
         self.currentPrice = currentPrice
+        self.purchasePrice = purchasePrice ?? currentPrice
         self.savedAt = savedAt
     }
     
@@ -68,6 +72,7 @@ struct AssetStorageDTO: Codable {
         self.name = asset.name
         self.amount = asset.amount
         self.currentPrice = asset.currentPrice
+        self.purchasePrice = asset.purchasePrice
         self.savedAt = Date()
     }
     
@@ -83,13 +88,19 @@ struct AssetStorageDTO: Codable {
         amount = try container.decodeIfPresent(Double.self, forKey: .amount) ?? 0.0
         
         // Try snake_case first, then camelCase
+        let decodedCurrentPrice: Double
         if let price = try? container.decodeIfPresent(Double.self, forKey: .currentPrice) {
-            currentPrice = price ?? 0.0
+            decodedCurrentPrice = price ?? 0.0
         } else if let price = try? container.decodeIfPresent(Double.self, forKey: .currentPriceCamel) {
-            currentPrice = price ?? 0.0
+            decodedCurrentPrice = price ?? 0.0
         } else {
-            currentPrice = 0.0
+            decodedCurrentPrice = 0.0
         }
+        currentPrice = decodedCurrentPrice
+        
+        // Purchase price — fallback to currentPrice for backward compatibility with old saved data
+        let decodedPurchasePrice = try container.decodeIfPresent(Double.self, forKey: .purchasePrice)
+        purchasePrice = decodedPurchasePrice ?? decodedCurrentPrice
         
         // Date handling: try snake_case, then camelCase, then default
         if let date = try? container.decodeIfPresent(Date.self, forKey: .savedAt) {
@@ -110,6 +121,7 @@ struct AssetStorageDTO: Codable {
         try container.encode(name, forKey: .name)
         try container.encode(amount, forKey: .amount)
         try container.encode(currentPrice, forKey: .currentPrice)
+        try container.encode(purchasePrice, forKey: .purchasePrice)
         try container.encode(savedAt, forKey: .savedAt)
     }
     
@@ -121,7 +133,8 @@ struct AssetStorageDTO: Codable {
             symbol: symbol,
             name: name,
             amount: amount,
-            currentPrice: currentPrice
+            currentPrice: currentPrice,
+            purchasePrice: purchasePrice
         )
     }
 }

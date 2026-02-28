@@ -18,6 +18,8 @@ struct Asset: Identifiable, Equatable, Hashable, Sendable {
     let name: String
     let amount: Double
     let currentPrice: Double
+    /// Price at the time of purchase — used for gain/loss calculation
+    let purchasePrice: Double
     let totalValue: Double
     let iconURL: URL?
     let priceChangePercentage24h: Double?
@@ -32,6 +34,7 @@ struct Asset: Identifiable, Equatable, Hashable, Sendable {
         name: String,
         amount: Double,
         currentPrice: Double,
+        purchasePrice: Double? = nil,
         totalValue: Double? = nil,
         iconURL: URL? = nil,
         priceChangePercentage24h: Double? = nil,
@@ -43,6 +46,7 @@ struct Asset: Identifiable, Equatable, Hashable, Sendable {
         self.name = name
         self.amount = amount
         self.currentPrice = currentPrice
+        self.purchasePrice = purchasePrice ?? currentPrice
         self.totalValue = totalValue ?? (amount * currentPrice)
         self.iconURL = iconURL
         self.priceChangePercentage24h = priceChangePercentage24h
@@ -54,6 +58,29 @@ struct Asset: Identifiable, Equatable, Hashable, Sendable {
     
     var isPositive: Bool {
         totalValue >= 0
+    }
+    
+    /// Gain or loss in USD relative to purchase price
+    var gainLoss: Double {
+        (currentPrice - purchasePrice) * amount
+    }
+    
+    /// Gain or loss as a percentage relative to purchase price
+    var gainLossPercentage: Double {
+        guard purchasePrice > 0 else { return 0 }
+        return ((currentPrice - purchasePrice) / purchasePrice) * 100
+    }
+    
+    var isGainLossPositive: Bool {
+        gainLoss >= 0
+    }
+    
+    var formattedGainLoss: String {
+        String(format: "%@$%.2f", gainLoss >= 0 ? "+" : "", gainLoss)
+    }
+    
+    var formattedGainLossPercentage: String {
+        String(format: "%@%.2f%%", gainLossPercentage >= 0 ? "+" : "", gainLossPercentage)
     }
     
     var formattedValue: String {
@@ -89,6 +116,7 @@ extension Asset: Codable {
         case name
         case amount
         case currentPrice = "current_price"
+        case purchasePrice = "purchase_price"
         case totalValue = "total_value"
         case iconURL = "icon_url"
         case image  // Alternative key for icon
@@ -106,6 +134,10 @@ extension Asset: Codable {
         name = try container.decodeIfPresent(String.self, forKey: .name) ?? ""
         amount = try container.decodeIfPresent(Double.self, forKey: .amount) ?? 0.0
         currentPrice = try container.decodeIfPresent(Double.self, forKey: .currentPrice) ?? 0.0
+        
+        // Purchase price — fallback to currentPrice for backward compatibility
+        let decodedPurchasePrice = try container.decodeIfPresent(Double.self, forKey: .purchasePrice)
+        purchasePrice = decodedPurchasePrice ?? currentPrice
         
         // Computed field with fallback
         let decodedTotalValue = try container.decodeIfPresent(Double.self, forKey: .totalValue)
@@ -130,6 +162,7 @@ extension Asset: Codable {
         try container.encode(name, forKey: .name)
         try container.encode(amount, forKey: .amount)
         try container.encode(currentPrice, forKey: .currentPrice)
+        try container.encode(purchasePrice, forKey: .purchasePrice)
         try container.encode(totalValue, forKey: .totalValue)
         try container.encodeIfPresent(iconURL?.absoluteString, forKey: .iconURL)
         try container.encodeIfPresent(priceChangePercentage24h, forKey: .priceChangePercentage24h)

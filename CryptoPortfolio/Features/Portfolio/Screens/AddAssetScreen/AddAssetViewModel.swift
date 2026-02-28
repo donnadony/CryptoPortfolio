@@ -64,7 +64,8 @@ final class AddAssetViewModel: ObservableObject {
                 symbol: symbol.uppercased(),
                 name: symbol.uppercased(),
                 amount: amountValue,
-                currentPrice: currentPrice
+                currentPrice: currentPrice,
+                purchasePrice: currentPrice  // Lock in purchase price for gain/loss tracking
             )
             
             try await addAssetUseCase.execute(asset)

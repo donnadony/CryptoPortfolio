@@ -206,12 +206,11 @@ final class PortfolioViewModel: ObservableObject {
     
     // MARK: - Private Methods
     
-    /// Recalculate totals from current assets
+    /// Recalculate totals from current assets using purchase price for gain/loss
     private func recalculateTotals() {
         totalValue = assets.reduce(0) { $0 + $1.totalValue }
-        // For now, we calculate gain/loss as 0 since we don't track purchase price
-        // This would need historical data to be accurate
-        gainLoss = 0
-        gainLossPercentage = 0
+        let totalInvested = assets.reduce(0) { $0 + ($1.purchasePrice * $1.amount) }
+        gainLoss = totalValue - totalInvested
+        gainLossPercentage = totalInvested > 0 ? (gainLoss / totalInvested) * 100 : 0
     }
 }

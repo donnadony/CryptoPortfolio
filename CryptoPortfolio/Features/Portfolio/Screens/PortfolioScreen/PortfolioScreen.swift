@@ -242,15 +242,32 @@ struct AssetRow: View {
     
     var body: some View {
         HStack(spacing: AppTheme.Spacing.md) {
-            // Icon
+            // Icon — show real coin image when available, fallback to symbol letter
             ZStack {
                 Circle()
                     .fill(AppTheme.Colors.primary.opacity(0.15))
                     .frame(width: 48, height: 48)
                 
-                Text(String(asset.symbol.prefix(1)))
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundStyle(AppTheme.Colors.primary)
+                if let iconURL = asset.iconURL {
+                    AsyncImage(url: iconURL) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                                .clipShape(Circle())
+                        default:
+                            Text(String(asset.symbol.prefix(1)))
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundStyle(AppTheme.Colors.primary)
+                        }
+                    }
+                } else {
+                    Text(String(asset.symbol.prefix(1)))
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(AppTheme.Colors.primary)
+                }
             }
             
             // Info

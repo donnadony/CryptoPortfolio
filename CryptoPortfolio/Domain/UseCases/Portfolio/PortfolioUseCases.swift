@@ -131,12 +131,15 @@ final class CalculatePortfolioTotalUseCase: CalculatePortfolioTotalUseCaseProtoc
         for asset in assets {
             do {
                 let price = try await repository.fetchPrice(symbol: asset.symbol)
+                // Preserve the original purchasePrice — only update currentPrice
                 let newAsset = Asset(
                     id: asset.id,
                     symbol: asset.symbol,
                     name: asset.name,
                     amount: asset.amount,
-                    currentPrice: price
+                    currentPrice: price,
+                    purchasePrice: asset.purchasePrice,
+                    iconURL: asset.iconURL
                 )
                 updatedAssets.append(newAsset)
                 
@@ -148,9 +151,9 @@ final class CalculatePortfolioTotalUseCase: CalculatePortfolioTotalUseCaseProtoc
             }
         }
         
-        // Calculate totals
+        // Calculate totals using purchasePrice for true gain/loss
         let totalValue = updatedAssets.reduce(0) { $0 + $1.totalValue }
-        let totalInvested = updatedAssets.reduce(0) { $0 + ($1.amount * $1.currentPrice) }
+        let totalInvested = updatedAssets.reduce(0) { $0 + ($1.purchasePrice * $1.amount) }
         let gainLoss = totalValue - totalInvested
         let gainLossPercentage = totalInvested > 0 ? (gainLoss / totalInvested) * 100 : 0
         
