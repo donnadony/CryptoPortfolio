@@ -23,7 +23,6 @@ platform :ios do
   
   desc "Generate screenshots in Light Mode"
   lane :screenshots_light do
-    # Ensure we have the right simulator
     snapshot(
       scheme: "CryptoPortfolio",
       devices: ["iPhone 15 Pro"],
@@ -34,7 +33,8 @@ platform :ios do
       skip_open_summary: true,
       ios_version: "18.0",
       reinstall_app: true,
-      xcargs: "-skipPackagePluginValidation SDKROOT=iphoneos",
+      # SDKROOT=iphoneos was wrong for simulator — removed
+      xcargs: "-skipPackagePluginValidation",
       test_without_building: false
     )
   end
@@ -51,7 +51,7 @@ platform :ios do
       skip_open_summary: true,
       ios_version: "18.0",
       reinstall_app: true,
-      xcargs: "-skipPackagePluginValidation SDKROOT=iphoneos",
+      xcargs: "-skipPackagePluginValidation",
       test_without_building: false
     )
   end
@@ -88,6 +88,8 @@ platform :ios do
       scheme: "CryptoPortfolio",
       configuration: "Debug",
       sdk: "iphonesimulator",
+      # Explicitly target iOS Simulator — without this gym defaults to visionOS
+      destination: "generic/platform=iOS Simulator",
       skip_package_pkg: true,
       skip_archive: true,
       skip_codesigning: true,
