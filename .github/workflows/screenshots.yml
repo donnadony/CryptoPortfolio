@@ -15,6 +15,10 @@ env:
   FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
   FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
 
+permissions:
+  contents: read
+  pull-requests: write  # Required for PR comment step
+
 jobs:
   screenshots:
     name: Generate Screenshots (${{ matrix.scheme }})
