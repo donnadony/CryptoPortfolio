@@ -67,16 +67,28 @@ final class Container: ObservableObject {
     
     // MARK: - Initialization
     
+    /// Returns true when running in UI Test / screenshot mode
+    static var isUITesting: Bool {
+        ProcessInfo.processInfo.arguments.contains("UI_TEST_MODE")
+    }
+
     private init() {
         // Core Dependencies
         self.apiService = APIService()
         self.localStorage = UserDefaultsLocalStorage()
         self.rateLimiter = RateLimiter()
         
-        // Data Sources
-        self.portfolioRemoteDataSource = PortfolioRemoteDataSource(apiService: apiService)
-        self.portfolioLocalDataSource = PortfolioLocalDataSource(localStorage: localStorage)
-        self.marketRemoteDataSource = MarketRemoteDataSource(apiService: apiService, rateLimiter: rateLimiter)
+        // Data Sources — use offline mocks in UI test mode so tests don't hang on network
+        let isTesting = Container.isUITesting
+        self.portfolioRemoteDataSource = isTesting
+            ? MockPortfolioRemoteDataSource()
+            : PortfolioRemoteDataSource(apiService: apiService)
+        self.portfolioLocalDataSource = isTesting
+            ? MockPortfolioLocalDataSource()
+            : PortfolioLocalDataSource(localStorage: localStorage)
+        self.marketRemoteDataSource = isTesting
+            ? MockMarketRemoteDataSource()
+            : MarketRemoteDataSource(apiService: apiService, rateLimiter: rateLimiter)
         self.watchlistLocalDataSource = WatchlistLocalDataSource(localStorage: localStorage)
         self.settingsLocalDataSource = SettingsLocalDataSource(localStorage: localStorage)
         

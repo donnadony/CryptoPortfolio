@@ -23,18 +23,17 @@ platform :ios do
   
   desc "Generate screenshots in Light Mode"
   lane :screenshots_light do
-    # Ensure we have the right simulator
     snapshot(
       scheme: "CryptoPortfolio",
-      devices: ["iPhone 15 Pro"],
+      devices: ["iPhone 16 Pro"],
       languages: ["en-US", "es-ES"],
       output_directory: "./fastlane/screenshots/light",
       clear_previous_screenshots: true,
       dark_mode: false,
       skip_open_summary: true,
-      ios_version: "18.0",
+      # No ios_version pin — use whatever runtime is available on the runner
       reinstall_app: true,
-      xcargs: "-skipPackagePluginValidation SDKROOT=iphoneos",
+      xcargs: "-skipPackagePluginValidation",
       test_without_building: false
     )
   end
@@ -43,15 +42,14 @@ platform :ios do
   lane :screenshots_dark do
     snapshot(
       scheme: "CryptoPortfolio",
-      devices: ["iPhone 15 Pro"],
+      devices: ["iPhone 16 Pro"],
       languages: ["en-US", "es-ES"],
       output_directory: "./fastlane/screenshots/dark",
       clear_previous_screenshots: true,
       dark_mode: true,
       skip_open_summary: true,
-      ios_version: "18.0",
       reinstall_app: true,
-      xcargs: "-skipPackagePluginValidation SDKROOT=iphoneos",
+      xcargs: "-skipPackagePluginValidation",
       test_without_building: false
     )
   end
@@ -84,16 +82,17 @@ platform :ios do
   
   desc "Build app for testing"
   lane :build_for_testing do
-    gym(
+    # gym is for IPA/archive builds — wrong tool for test builds.
+    # scan with build_for_testing:true is the correct fastlane approach.
+    scan(
       scheme: "CryptoPortfolio",
       configuration: "Debug",
       sdk: "iphonesimulator",
-      skip_package_pkg: true,
-      skip_archive: true,
-      skip_codesigning: true,
-      build_path: "./build",
+      destination: "platform=iOS Simulator,OS=18.2,name=iPhone 16 Pro",
+      build_for_testing: true,
       derived_data_path: "./DerivedData",
-      xcargs: "-skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO"
+      xcargs: "-skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO",
+      skip_slack: true
     )
   end
   

@@ -11,64 +11,102 @@ on:
       - develop
 
 env:
-  DEVELOPER_DIR: /Applications/Xcode_16.0.app/Contents/Developer
+  # Generous timeout for xcodebuild -showBuildSettings on CI
+  FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
+  FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
+
+permissions:
+  contents: read
+  pull-requests: write  # Required for PR comment step
 
 jobs:
   screenshots:
-    name: Generate Screenshots
+    name: Generate Screenshots (${{ matrix.scheme }})
     runs-on: macos-latest
-    
+
     strategy:
       matrix:
         scheme: [CryptoPortfolio]
-        
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        # latest-stable picks whichever Xcode ships with the runner (16.2 on macos-latest)
+        # avoids mismatches between Xcode and pre-installed simulator runtimes
+        xcode-version: 'latest-stable'
+
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
         bundler-cache: true
-        
-    - name: Install dependencies
+
+    - name: Check available runtimes and simulators
       run: |
-        gem install fastlane
-        
-    - name: Setup Xcode
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '16.0'
-        
-    - name: List available simulators
-      run: xcrun simctl list devices
-      
-    - name: Build app for testing
-      run: fastlane ios build_for_testing
-      
+        echo "=== Xcode version ==="
+        xcodebuild -version
+
+        echo "=== Available Runtimes ==="
+        xcrun simctl list runtimes
+
+        echo "=== Available iPhone Simulators ==="
+        xcrun simctl list devices available | grep -i iphone || echo "No iPhones listed yet"
+
+    - name: Boot iPhone Simulator
+      run: |
+        # Pick the best available iPhone 16 Pro — fall back to any iPhone
+        UDID=$(xcrun simctl list devices available | grep "iPhone 16 Pro" \
+          | grep -Eo '\([A-F0-9-]+\)' | tr -d '()' | head -1)
+
+        if [ -z "$UDID" ]; then
+          echo "iPhone 16 Pro not found, trying any iPhone..."
+          UDID=$(xcrun simctl list devices available | grep "iPhone" \
+            | grep -Eo '\([A-F0-9-]+\)' | tr -d '()' | head -1)
+        fi
+
+        if [ -n "$UDID" ]; then
+          echo "Booting simulator: $UDID"
+          xcrun simctl boot "$UDID" 2>/dev/null || true
+          # Wait until booted
+          for i in $(seq 1 10); do
+            STATE=$(xcrun simctl list devices | grep "$UDID" | grep -o "Booted" || true)
+            if [ "$STATE" = "Booted" ]; then
+              echo "✅ Simulator booted"
+              break
+            fi
+            echo "Waiting for simulator... ($i/10)"
+            sleep 3
+          done
+        else
+          echo "⚠️ No iPhone simulator found — snapshot will manage its own"
+        fi
+
     - name: Run Light Mode Screenshots
-      run: fastlane ios screenshots_light
+      run: bundle exec fastlane ios screenshots_light
       continue-on-error: true
-      
+
     - name: Run Dark Mode Screenshots
-      run: fastlane ios screenshots_dark
+      run: bundle exec fastlane ios screenshots_dark
       continue-on-error: true
-      
+
     - name: Upload Light Mode Screenshots
       uses: actions/upload-artifact@v4
       with:
         name: screenshots-light
         path: fastlane/screenshots/light/
         retention-days: 30
-        
+
     - name: Upload Dark Mode Screenshots
       uses: actions/upload-artifact@v4
       with:
         name: screenshots-dark
         path: fastlane/screenshots/dark/
         retention-days: 30
-        
+
     - name: Comment PR with Screenshots
       if: github.event_name == 'pull_request'
       uses: actions/github-script@v7
@@ -79,21 +117,21 @@ jobs:
             repo: context.repo.repo,
             run_id: context.runId
           });
-          
+
           const lightScreenshots = artifacts.find(a => a.name === 'screenshots-light');
           const darkScreenshots = artifacts.find(a => a.name === 'screenshots-dark');
-          
+
           let body = '## 📸 Screenshots Generated\n\n';
           body += 'Screenshots have been generated for this PR.\n\n';
           body += '### Downloads\n';
           if (lightScreenshots) {
-            body += `- [Light Mode Screenshots](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${lightScreenshots.id})\n`;
+            body += `- [Light Mode Screenshots](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${lightScreenshots.id})\n`;
           }
           if (darkScreenshots) {
-            body += `- [Dark Mode Screenshots](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${darkScreenshots.id})\n`;
+            body += `- [Dark Mode Screenshots](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}/artifacts/${darkScreenshots.id})\n`;
           }
           body += '\n> Note: Download the artifacts to view the full screenshots.\n';
-          
+
           github.rest.issues.createComment({
             issue_number: context.issue.number,
             owner: context.repo.owner,
@@ -105,26 +143,22 @@ jobs:
     name: Run UI Tests
     runs-on: macos-latest
     needs: screenshots
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: 'latest-stable'
+
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
         bundler-cache: true
-        
-    - name: Install dependencies
-      run: |
-        gem install fastlane
-        
-    - name: Setup Xcode
-      uses: maxim-lobanov/setup-xcode@v1
-      with:
-        xcode-version: '16.0'
-        
+
     - name: Run UI Tests
-      run: fastlane ios ui_tests
+      run: bundle exec fastlane ios ui_tests
       continue-on-error: true
