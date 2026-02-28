@@ -31,9 +31,8 @@ platform :ios do
       clear_previous_screenshots: true,
       dark_mode: false,
       skip_open_summary: true,
-      ios_version: "18.0",
+      # No ios_version pin — use whatever runtime is available on the runner
       reinstall_app: true,
-      # SDKROOT=iphoneos was wrong for simulator — removed
       xcargs: "-skipPackagePluginValidation",
       test_without_building: false
     )
@@ -49,7 +48,6 @@ platform :ios do
       clear_previous_screenshots: true,
       dark_mode: true,
       skip_open_summary: true,
-      ios_version: "18.0",
       reinstall_app: true,
       xcargs: "-skipPackagePluginValidation",
       test_without_building: false
