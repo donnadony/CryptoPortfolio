@@ -17,7 +17,8 @@ struct Constants {
     struct UserDefaultsKeys {
         static let currency = "selectedCurrency"
         static let theme = "selectedTheme"
-        static let portfolio = "portfolioAssets"
+        // Must match the key used in PortfolioLocalDataSource
+        static let portfolio = "crypto_portfolio_assets"
     }
     
     // MARK: - Default Values

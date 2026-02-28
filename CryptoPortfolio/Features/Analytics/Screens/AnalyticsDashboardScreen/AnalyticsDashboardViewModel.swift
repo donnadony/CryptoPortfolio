@@ -189,7 +189,7 @@ final class AnalyticsDashboardViewModel: ObservableObject {
                     .prefix(5)
                     .map { $0 }
                 
-                // Calculate daily change (weighted average)
+                // Calculate daily change (weighted average of 24h price changes)
                 if totalValue > 0 {
                     dailyChange = assets.reduce(0) { result, asset in
                         let weight = asset.totalValue / totalValue
@@ -200,8 +200,11 @@ final class AnalyticsDashboardViewModel: ObservableObject {
                     dailyChange = 0
                 }
                 
-                // Mock total return for demo (would come from historical data)
-                totalReturn = dailyChange * 7 // Simplified
+                // Real all-time total return using purchase price
+                let totalInvested = assets.reduce(0) { $0 + ($1.purchasePrice * $1.amount) }
+                totalReturn = totalInvested > 0
+                    ? ((totalValue - totalInvested) / totalInvested) * 100
+                    : 0
                 
                 let analyticsData = AnalyticsData(
                     assets: assets,
@@ -230,8 +233,9 @@ final class AnalyticsDashboardViewModel: ObservableObject {
     }
     
     func selectTimeframe(_ timeframe: AnalyticsTimeframe) {
+        guard selectedTimeframe != timeframe else { return }
         selectedTimeframe = timeframe
-        // In production, this would reload data for the selected timeframe
+        Task { await loadAnalytics() }
     }
     
     func clearError() {

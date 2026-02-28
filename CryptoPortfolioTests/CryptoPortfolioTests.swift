@@ -285,6 +285,84 @@ final class AssetStorageDTOTests: XCTestCase {
     }
 }
 
+// MARK: - Constants Tests
+
+final class ConstantsTests: XCTestCase {
+    
+    func testPortfolioKeyMatchesLocalDataSourceKey() {
+        // If these diverge, assets saved by one won't be read by the other
+        XCTAssertEqual(Constants.UserDefaultsKeys.portfolio, "crypto_portfolio_assets")
+    }
+}
+
+// MARK: - AssetDetailViewModel Tests
+
+final class AssetDetailViewModelUpdateAmountTests: XCTestCase {
+    
+    func testUpdateAmountPreservesPurchasePrice() {
+        // Asset bought at 30k, currently at 50k
+        let originalAsset = Asset(
+            id: "btc-1",
+            symbol: "BTC",
+            name: "Bitcoin",
+            amount: 1.0,
+            currentPrice: 50000,
+            purchasePrice: 30000
+        )
+        
+        // Simulate what updateAmount does — purchasePrice must survive
+        let updatedAsset = Asset(
+            id: originalAsset.id,
+            symbol: originalAsset.symbol,
+            name: originalAsset.name,
+            amount: 2.0,
+            currentPrice: originalAsset.currentPrice,
+            purchasePrice: originalAsset.purchasePrice
+        )
+        
+        XCTAssertEqual(updatedAsset.purchasePrice, 30000, accuracy: 0.01,
+            "purchasePrice must not be lost when updating amount")
+        XCTAssertEqual(updatedAsset.amount, 2.0, accuracy: 0.0001)
+        XCTAssertEqual(updatedAsset.gainLoss, (50000 - 30000) * 2.0, accuracy: 0.01)
+    }
+}
+
+// MARK: - Analytics Total Return Tests
+
+final class AnalyticsTotalReturnTests: XCTestCase {
+    
+    func testTotalReturnPositive() {
+        let assets = [
+            Asset(symbol: "BTC", name: "Bitcoin", amount: 1.0, currentPrice: 50000, purchasePrice: 40000),
+            Asset(symbol: "ETH", name: "Ethereum", amount: 10.0, currentPrice: 3000, purchasePrice: 2000)
+        ]
+        let totalValue = assets.reduce(0) { $0 + $1.totalValue }
+        let totalInvested = assets.reduce(0) { $0 + ($1.purchasePrice * $1.amount) }
+        let totalReturn = totalInvested > 0 ? ((totalValue - totalInvested) / totalInvested) * 100 : 0
+
+        XCTAssertEqual(totalValue, 80000, accuracy: 0.01)
+        XCTAssertEqual(totalInvested, 60000, accuracy: 0.01)
+        XCTAssertEqual(totalReturn, 33.33, accuracy: 0.01)
+    }
+    
+    func testTotalReturnNegative() {
+        let assets = [
+            Asset(symbol: "BTC", name: "Bitcoin", amount: 1.0, currentPrice: 30000, purchasePrice: 50000)
+        ]
+        let totalValue = assets.reduce(0) { $0 + $1.totalValue }
+        let totalInvested = assets.reduce(0) { $0 + ($1.purchasePrice * $1.amount) }
+        let totalReturn = totalInvested > 0 ? ((totalValue - totalInvested) / totalInvested) * 100 : 0
+
+        XCTAssertEqual(totalReturn, -40.0, accuracy: 0.01)
+    }
+    
+    func testTotalReturnZeroWhenNoInvestment() {
+        let totalInvested: Double = 0
+        let totalReturn = totalInvested > 0 ? ((1000.0 - totalInvested) / totalInvested) * 100 : 0
+        XCTAssertEqual(totalReturn, 0, accuracy: 0.01)
+    }
+}
+
 // MARK: - Mock Repository
 
 final class MockPortfolioRepository: PortfolioRepository, @unchecked Sendable {

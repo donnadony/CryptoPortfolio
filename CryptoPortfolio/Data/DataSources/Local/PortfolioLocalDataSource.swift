@@ -37,7 +37,7 @@ protocol PortfolioLocalDataSourceProtocol: Sendable {
 final class PortfolioLocalDataSource: PortfolioLocalDataSourceProtocol, @unchecked Sendable {
     
     private let localStorage: LocalStorageProtocol
-    private let portfolioKey = "crypto_portfolio_assets"
+    private let portfolioKey = Constants.UserDefaultsKeys.portfolio
     private let migrationKey = "crypto_portfolio_migrated_v2"
     
     private let logger = Logger(subsystem: "CryptoPortfolio", category: "PortfolioLocalDataSource")

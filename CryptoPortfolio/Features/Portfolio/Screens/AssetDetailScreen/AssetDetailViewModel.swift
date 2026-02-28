@@ -105,7 +105,7 @@ final class AssetDetailViewModel: ObservableObject {
         await loadTask?.value
     }
     
-    /// Update the asset amount
+    /// Update the asset amount — purchasePrice is preserved so gain/loss stays accurate
     func updateAmount(_ newAmount: Double) async {
         guard newAmount > 0 else {
             error = DomainError.invalidAmount
@@ -118,7 +118,8 @@ final class AssetDetailViewModel: ObservableObject {
                 symbol: asset.symbol,
                 name: asset.name,
                 amount: newAmount,
-                currentPrice: asset.currentPrice
+                currentPrice: asset.currentPrice,
+                purchasePrice: asset.purchasePrice  // preserve original buy-in price
             )
             
             try await updateAssetUseCase.execute(updatedAsset)
