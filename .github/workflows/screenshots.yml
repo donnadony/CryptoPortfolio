@@ -10,6 +10,11 @@ on:
       - main
       - develop
 
+env:
+  # Increase timeout for xcodebuild -showBuildSettings (default 3s is too low on CI)
+  FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
+  FASTLANE_XCODEBUILD_SETTINGS_RETRIES: 5
+
 jobs:
   screenshots:
     name: Generate Screenshots (${{ matrix.scheme }})
@@ -52,16 +57,19 @@ jobs:
 
     - name: Boot iPhone 15 Pro Simulator
       run: |
-        UDID=$(xcrun simctl create "iPhone 15 Pro" "iPhone 15 Pro" "iOS18.2" 2>/dev/null || \
-               xcrun simctl list devices | grep "iPhone 15 Pro" | grep -E "\(([A-F0-9-]+)\)" -o | tr -d "()" | head -1)
-        echo "Simulator UDID: $UDID"
+        # Boot simulator so xcodebuild -showBuildSettings doesn't time out
+        UDID=$(xcrun simctl list devices available | grep "iPhone 15 Pro" | grep -E '\(([A-F0-9-]+)\)' -o | tr -d '()' | head -1)
+        if [ -z "$UDID" ]; then
+          echo "Creating iPhone 15 Pro simulator..."
+          UDID=$(xcrun simctl create "iPhone 15 Pro CI" "iPhone 15 Pro" "com.apple.CoreSimulator.SimRuntime.iOS-18-2")
+        fi
+        echo "Booting simulator: $UDID"
         xcrun simctl boot "$UDID" 2>/dev/null || true
+        # Wait for it to reach booted state
+        xcrun simctl bootstatus "$UDID" -b 2>/dev/null || sleep 15
 
     - name: List available simulators
-      run: xcrun simctl list devices available | grep -E "iPhone 1[5-6]"
-
-    - name: Build app for testing
-      run: bundle exec fastlane ios build_for_testing
+      run: xcrun simctl list devices available | grep -E "iPhone 1[5-6]" || xcrun simctl list devices available | grep -i iphone
 
     - name: Run Light Mode Screenshots
       run: bundle exec fastlane ios screenshots_light
