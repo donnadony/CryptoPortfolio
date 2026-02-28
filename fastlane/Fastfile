@@ -84,18 +84,17 @@ platform :ios do
   
   desc "Build app for testing"
   lane :build_for_testing do
-    gym(
+    # gym is for IPA/archive builds — wrong tool for test builds.
+    # scan with build_for_testing:true is the correct fastlane approach.
+    scan(
       scheme: "CryptoPortfolio",
       configuration: "Debug",
       sdk: "iphonesimulator",
-      # Explicitly target iOS Simulator — without this gym defaults to visionOS
-      destination: "generic/platform=iOS Simulator",
-      skip_package_pkg: true,
-      skip_archive: true,
-      skip_codesigning: true,
-      build_path: "./build",
+      destination: "platform=iOS Simulator,OS=18.2,name=iPhone 15 Pro",
+      build_for_testing: true,
       derived_data_path: "./DerivedData",
-      xcargs: "-skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO"
+      xcargs: "-skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO",
+      skip_slack: true
     )
   end
   

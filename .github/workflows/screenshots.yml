@@ -26,21 +26,41 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        # 16.2 is what ships on macos-latest (Sequoia); 16.0 is not available
         xcode-version: '16.2'
 
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
-        # bundler-cache installs gems from Gemfile and caches them
         bundler-cache: true
+
+    - name: Cache iOS Simulator Runtime
+      id: ios-runtime-cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Developer/CoreSimulator/Volumes/
+          /Library/Developer/CoreSimulator/Volumes/
+        key: ios-runtime-18.2-xcode-16.2-${{ runner.os }}
+
+    - name: Install iOS 18.2 Simulator Runtime
+      if: steps.ios-runtime-cache.outputs.cache-hit != 'true'
+      run: |
+        echo "iOS runtime not cached — downloading iOS 18.2 simulator..."
+        sudo xcodebuild -downloadPlatform iOS
+        echo "✅ iOS platform download complete"
+
+    - name: Boot iPhone 15 Pro Simulator
+      run: |
+        UDID=$(xcrun simctl create "iPhone 15 Pro" "iPhone 15 Pro" "iOS18.2" 2>/dev/null || \
+               xcrun simctl list devices | grep "iPhone 15 Pro" | grep -E "\(([A-F0-9-]+)\)" -o | tr -d "()" | head -1)
+        echo "Simulator UDID: $UDID"
+        xcrun simctl boot "$UDID" 2>/dev/null || true
 
     - name: List available simulators
       run: xcrun simctl list devices available | grep -E "iPhone 1[5-6]"
 
     - name: Build app for testing
-      # Use bundle exec so the Gemfile-pinned fastlane version is used
       run: bundle exec fastlane ios build_for_testing
 
     - name: Run Light Mode Screenshots
@@ -116,6 +136,19 @@ jobs:
       with:
         ruby-version: '3.2'
         bundler-cache: true
+
+    - name: Cache iOS Simulator Runtime
+      id: ios-runtime-cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/Library/Developer/CoreSimulator/Volumes/
+          /Library/Developer/CoreSimulator/Volumes/
+        key: ios-runtime-18.2-xcode-16.2-${{ runner.os }}
+
+    - name: Install iOS 18.2 Simulator Runtime
+      if: steps.ios-runtime-cache.outputs.cache-hit != 'true'
+      run: sudo xcodebuild -downloadPlatform iOS
 
     - name: Run UI Tests
       run: bundle exec fastlane ios ui_tests
