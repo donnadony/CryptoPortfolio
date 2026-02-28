@@ -58,12 +58,12 @@ jobs:
 
     - name: Boot iPhone Simulator
       run: |
-        # Pick the best available iPhone 15 Pro — fall back to any iPhone
-        UDID=$(xcrun simctl list devices available | grep "iPhone 15 Pro" \
+        # Pick the best available iPhone 16 Pro — fall back to any iPhone
+        UDID=$(xcrun simctl list devices available | grep "iPhone 16 Pro" \
           | grep -Eo '\([A-F0-9-]+\)' | tr -d '()' | head -1)
 
         if [ -z "$UDID" ]; then
-          echo "iPhone 15 Pro not found, trying any iPhone..."
+          echo "iPhone 16 Pro not found, trying any iPhone..."
           UDID=$(xcrun simctl list devices available | grep "iPhone" \
             | grep -Eo '\([A-F0-9-]+\)' | tr -d '()' | head -1)
         fi

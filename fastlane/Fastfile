@@ -25,7 +25,7 @@ platform :ios do
   lane :screenshots_light do
     snapshot(
       scheme: "CryptoPortfolio",
-      devices: ["iPhone 15 Pro"],
+      devices: ["iPhone 16 Pro"],
       languages: ["en-US", "es-ES"],
       output_directory: "./fastlane/screenshots/light",
       clear_previous_screenshots: true,
@@ -42,7 +42,7 @@ platform :ios do
   lane :screenshots_dark do
     snapshot(
       scheme: "CryptoPortfolio",
-      devices: ["iPhone 15 Pro"],
+      devices: ["iPhone 16 Pro"],
       languages: ["en-US", "es-ES"],
       output_directory: "./fastlane/screenshots/dark",
       clear_previous_screenshots: true,
@@ -88,7 +88,7 @@ platform :ios do
       scheme: "CryptoPortfolio",
       configuration: "Debug",
       sdk: "iphonesimulator",
-      destination: "platform=iOS Simulator,OS=18.2,name=iPhone 15 Pro",
+      destination: "platform=iOS Simulator,OS=18.2,name=iPhone 16 Pro",
       build_for_testing: true,
       derived_data_path: "./DerivedData",
       xcargs: "-skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO",
